@@ -1,5 +1,12 @@
 // gmlib
-namespace GMlib { class GMWindow; }
+namespace GMlib {
+
+  class GMWindow;
+
+  template<typename T, int n>
+  class PSurf;
+}
+#include "core/gmPoint"
 
 // qt
 #include <QObject>
@@ -17,8 +24,16 @@ public:
   void                      start();
   void                      stop();
 
+  void                      setupTestScene();
+
 public slots:
   void                      changeRenderGeometry( const QRectF &new_geometry );
+
+
+  void                      moveObjFw();
+  void                      moveObjBw();
+  void                      moveObjLeft();
+  void                      moveObjRight();
 
 protected:
   void                      timerEvent(QTimerEvent *e);
@@ -29,7 +44,15 @@ private:
   QOffscreenSurface*        _offscreensurface;
   QSize                     _tex_size;
   GMlib::GMWindow*          _gmwindow;
-  QOpenGLFramebufferObject* _fbo;
+
+
+  GMlib::PSurf<double,3>*   _world;
+  GMlib::PSurf<double,3>*   _obj;
+
+  GMlib::Point<double,2>    _obj_pos;
+
+
+  void                      moveObj( const GMlib::Vector<double,2>& dir );
 
 signals:
   void                      signFrameReady();

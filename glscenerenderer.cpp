@@ -8,10 +8,8 @@
 
 GLSceneRenderer::GLSceneRenderer(QQuickItem *parent)
   : QQuickItem(parent),
-    _tex(),
     _tex_size(1,1)
 {
-
   setFlag(ItemHasContents);
   setSmooth(false);
 }

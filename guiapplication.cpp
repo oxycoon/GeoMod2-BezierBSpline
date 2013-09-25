@@ -6,6 +6,7 @@
 
 // qt
 #include <QOpenGLContext>
+#include <QQuickItem>
 #include <QDebug>
 
 GuiApplication::GuiApplication(int argc, char *argv[]) :
@@ -13,9 +14,9 @@ GuiApplication::GuiApplication(int argc, char *argv[]) :
 {
   _window = new Window;
 
-//  connect( _window, &Window::sceneGraphInitialized,
-//           this,    &GuiApplication::onSGInit,
-//           Qt::DirectConnection );
+  connect( _window, &Window::sceneGraphInitialized,
+           this,    &GuiApplication::onSGInit,
+           Qt::DirectConnection );
 
   _window->show();
 }
@@ -40,4 +41,14 @@ void GuiApplication::onSGInit() {
            _gmlib,  &GMlibWrapper::changeRenderGeometry );
 
   _gmlib->start();
+
+
+
+
+  QQuickItem *root_item = _window->rootObject();
+  connect( root_item, SIGNAL(moveFw()),     _gmlib, SLOT(moveObjFw()) );
+  connect( root_item, SIGNAL(moveBw()),     _gmlib, SLOT(moveObjBw()) );
+  connect( root_item, SIGNAL(moveLeft()),   _gmlib, SLOT(moveObjLeft()) );
+  connect( root_item, SIGNAL(moveRight()),  _gmlib, SLOT(moveObjRight()) );
+
 }
