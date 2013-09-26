@@ -15,8 +15,7 @@ GuiApplication::GuiApplication(int argc, char *argv[]) :
   _window = new Window;
 
   connect( _window, &Window::sceneGraphInitialized,
-           this,    &GuiApplication::onSGInit,
-           Qt::DirectConnection );
+           this,    &GuiApplication::onSGInit );
 
   _window->show();
 }
@@ -34,7 +33,7 @@ void GuiApplication::onSGInit() {
   qDebug() << "Initialized GLformat: " << ctx->format();
 
   // Init GMlibWrapper
-  _gmlib = new GMlibWrapper( ctx, QSize(800,600) );
+  _gmlib = new GMlibWrapper( ctx, _window->size() );
   connect( _gmlib,  &GMlibWrapper::signFrameReady,
            _window, &Window::signFrameReady );
   connect( _window, &Window::signSceneRenderGeometryChanged,

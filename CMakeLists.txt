@@ -34,7 +34,7 @@ find_package(
   NO_DEFAULT_PATH
 )
 include_directories( ${GLEW_INCLUDE_DIRS} )
-add_definitions(-DGLEW_STATIC)
+#add_definitions(-DGLEW_STATIC)
 
 #######
 # Files

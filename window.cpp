@@ -3,6 +3,8 @@
 Window::Window(QWindow *parent) :
   QQuickView(parent) {
 
+  setClearBeforeRendering(false);
+
   // Set rendering surface type to GL surface
   setSurfaceType( OpenGLSurface );
 

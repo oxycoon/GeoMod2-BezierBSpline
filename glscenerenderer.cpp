@@ -14,6 +14,10 @@ GLSceneRenderer::GLSceneRenderer(QQuickItem *parent)
   setSmooth(false);
 }
 
+void GLSceneRenderer::doUpdate() {
+  update();
+}
+
 QSGNode* GLSceneRenderer::updatePaintNode(QSGNode* old_node, QQuickItem::UpdatePaintNodeData*) {
 
   if (width() <= 0 || height() <= 0) {
@@ -25,7 +29,7 @@ QSGNode* GLSceneRenderer::updatePaintNode(QSGNode* old_node, QQuickItem::UpdateP
   QSGSimpleTextureNode *node = static_cast<QSGSimpleTextureNode *>(old_node);
   if( !node ) {
     node = new QSGSimpleTextureNode;
-    _tex = GMlib::GL::Texture("display_render_target");
+    _tex = GMlib::GL::Texture("display_render_target", GL_TEXTURE_2D );
   }
 
   const QRectF r = boundingRect();
@@ -43,15 +47,15 @@ void GLSceneRenderer::itemChange(QQuickItem::ItemChange change, const QQuickItem
 
       Window *w = qobject_cast<Window*>(window());
       connect( w,     &Window::signFrameReady,
-               this,  &GLSceneRenderer::update );
+               this,  &GLSceneRenderer::doUpdate );
       connect( this,  &GLSceneRenderer::signRenderGeometryChanged,
                w,     &Window::signSceneRenderGeometryChanged );
     }
   }
 }
 
-void GLSceneRenderer::geometryChanged(const QRectF& newGeometry, const QRectF& /*oldGeometry*/) {
+void GLSceneRenderer::geometryChanged(const QRectF& new_geometry, const QRectF& /*oldGeometry*/) {
 
-  _tex_size = newGeometry.toRect().size();
-  emit signRenderGeometryChanged(newGeometry);
+  _tex_size = new_geometry.toRect().size();
+  emit signRenderGeometryChanged(new_geometry);
 }

@@ -6,6 +6,7 @@
 #include <gmParametricsModule>
 
 // Qt
+#include <QTimerEvent>
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
 #include <QRectF>
@@ -32,17 +33,23 @@ GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context, const QSize &initial_ren
     GMlib::GL::OGL::init();
 
     // Setup and init the GMlib GMWindow
-    _gmwindow = new GMlib::GMWindow;
+    _gmwindow = new GMlib::GMWindow(false);
     _gmwindow->init();
 
     // Setup a texture render target and resize the window
     _gmwindow->setRenderTarget( new GMlib::RenderTexture("display_render_target") );
+
+    setupTestScene();
+
     _gmwindow->reshape( _tex_size.width(), _tex_size.height() );
 
   } _context->doneCurrent();
 }
 
-GMlibWrapper::~GMlibWrapper() {}
+GMlibWrapper::~GMlibWrapper() {
+
+  stop();
+}
 
 void GMlibWrapper::changeRenderGeometry(const QRectF& new_geometry) {
 
@@ -66,31 +73,38 @@ void GMlibWrapper::changeRenderGeometry(const QRectF& new_geometry) {
 void GMlibWrapper::moveObjFw() {
 
   qDebug() << "Move obj Fw";
-  moveObj( GMlib::Vector<double,2>( 0.05, 0.0 ) );
+  moveObj( GMlib::Vector<float,2>( 0.05, 0.0 ) );
 }
 
 void GMlibWrapper::moveObjBw() {
 
   qDebug() << "Move obj Bw";
-  moveObj( GMlib::Vector<double,2>( -0.05, 0.0 ) );
+  moveObj( GMlib::Vector<float,2>( -0.05, 0.0 ) );
 }
 
 void GMlibWrapper::moveObjLeft() {
 
   qDebug() << "Move obj Left";
-  moveObj( GMlib::Vector<double,2>( 0.0, -0.05 ) );
+  moveObj( GMlib::Vector<float,2>( 0.0, -0.05 ) );
 }
 
 void GMlibWrapper::moveObjRight() {
 
   qDebug() << "Move obj Right";
-  moveObj( GMlib::Vector<double,2>( 0.0, 0.05 ) );
+  moveObj( GMlib::Vector<float,2>( 0.0, 0.05 ) );
 }
 
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
+  qDebug() << "Timer Event!!";
+
+
   if( !_context->isValid() )
     return;
+
+  qDebug() << "  Valid context";
+
+  e->accept();
 
   _context->makeCurrent(_offscreensurface); {
 
@@ -98,12 +112,13 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
     _gmwindow->simulate();
     _gmwindow->render();
 
-    emit signFrameReady();
-
   } _context->doneCurrent();
+
+
+  emit signFrameReady();
 }
 
-void GMlibWrapper::moveObj(const GMlib::Vector<double,2>& dir) {
+void GMlibWrapper::moveObj(const GMlib::Vector<float,2>& dir) {
 
   _obj_pos += dir;
 
@@ -116,12 +131,21 @@ void GMlibWrapper::moveObj(const GMlib::Vector<double,2>& dir) {
 
   _context->makeCurrent(_offscreensurface ); {
 
-    GMlib::DMatrix< GMlib::Vector<double,3> > w_eval = _world->evaluateGlobal( u, v, 1, 1 );
-    _obj->translateGlobal( (w_eval(0)(0) - _obj->getPos()) );// + (w_eval(1)(0) ^ w_eval(0)(1)) * _obj->getSurroundingSphereClean().getRadius() );
+    GMlib::DMatrix< GMlib::Vector<float,3> > w_eval = _world->evaluateGlobal( u, v, 1, 1 );
+    _obj->translateGlobal( (w_eval(0)(0) - _obj->getPos()) );
+
+    GMlib::Vector<float,3> n_corr = w_eval(1)(0) ^ w_eval(0)(1);
+    n_corr.normalize();
+    n_corr *= _obj->getSurroundingSphere().getRadius();
+    _obj->translateGlobal(n_corr);
+
   } _context->doneCurrent();
 }
 
 void GMlibWrapper::start() {
+
+  if( _timer_id )
+    return;
 
   _timer_id = startTimer(16, Qt::PreciseTimer);
   _gmwindow->toggleRun();
@@ -129,8 +153,12 @@ void GMlibWrapper::start() {
 
 void GMlibWrapper::stop() {
 
+  if( !_timer_id )
+    return;
+
   _gmwindow->toggleRun();
   killTimer(_timer_id);
+  _timer_id = 0;
 }
 
 void GMlibWrapper::setupTestScene() {
@@ -180,19 +208,19 @@ void GMlibWrapper::setupTestScene() {
   _gmwindow->addToViewSet( cam_side_idx, cam_front_idx, false );
 
 
-  _obj_pos = GMlib::Vector<double,2>( 0.0f, 0.0f );
+  _obj_pos = GMlib::Vector<float,2>( 0.0f, 0.0f );
 
-  _world = new GMlib::PTorus<double>();
+  _world = new GMlib::PTorus<float>();
   _world->toggleDefaultVisualizer();
   _world->replot( 200, 200, 1, 1 );
   _gmwindow->insert(_world);
 
-  _obj = new GMlib::PSphere<double>();
+  _obj = new GMlib::PSphere<float>(2);
   _obj->toggleDefaultVisualizer();
   _obj->replot( 200, 200, 1, 1 );
   _gmwindow->insert(_obj);
 
-  _obj_pos = GMlib::Vector<double,2>( 0.0f, 0.0f );
+  _obj_pos = GMlib::Vector<float,2>( 0.0f, 0.0f );
 
 
 

@@ -46,13 +46,13 @@ private:
   GMlib::GMWindow*          _gmwindow;
 
 
-  GMlib::PSurf<double,3>*   _world;
-  GMlib::PSurf<double,3>*   _obj;
+  GMlib::PSurf<float,3>*    _world;
+  GMlib::PSurf<float,3>*    _obj;
 
-  GMlib::Point<double,2>    _obj_pos;
+  GMlib::Point<float,2>     _obj_pos;
 
 
-  void                      moveObj( const GMlib::Vector<double,2>& dir );
+  void                      moveObj( const GMlib::Vector<float,2>& dir );
 
 signals:
   void                      signFrameReady();

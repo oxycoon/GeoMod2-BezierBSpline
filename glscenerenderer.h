@@ -9,6 +9,9 @@ class GLSceneRenderer : public QQuickItem {
 public:
   GLSceneRenderer( QQuickItem *parent = 0 );
 
+public slots:
+  void                  doUpdate();
+
 signals:
   void                  signRenderGeometryChanged(const QRectF &geometry);
 
@@ -19,6 +22,6 @@ protected:
   void                  geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 
 private:
-  GMlib::GL::Texture    _tex;
   QSize                 _tex_size;
+  GMlib::GL::Texture    _tex;
 };
