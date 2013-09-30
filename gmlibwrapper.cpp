@@ -96,13 +96,8 @@ void GMlibWrapper::moveObjRight() {
 
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
-  qDebug() << "Timer Event!!";
-
-
   if( !_context->isValid() )
     return;
-
-  qDebug() << "  Valid context";
 
   e->accept();
 
@@ -127,17 +122,17 @@ void GMlibWrapper::moveObj(const GMlib::Vector<float,2>& dir) {
 
   double u, v;
   u = _world->getParStartU() + _world->getParDeltaU() * _obj_pos(0);
-  u = _world->getParStartV() + _world->getParDeltaV() * _obj_pos(1);
+  v = _world->getParStartV() + _world->getParDeltaV() * _obj_pos(1);
 
   _context->makeCurrent(_offscreensurface ); {
 
     GMlib::DMatrix< GMlib::Vector<float,3> > w_eval = _world->evaluateGlobal( u, v, 1, 1 );
-    _obj->translateGlobal( (w_eval(0)(0) - _obj->getPos()) );
+//    _obj->translateGlobal( (w_eval(0)(0) - _obj->getPos()) );
 
     GMlib::Vector<float,3> n_corr = w_eval(1)(0) ^ w_eval(0)(1);
     n_corr.normalize();
     n_corr *= _obj->getSurroundingSphere().getRadius();
-    _obj->translateGlobal(n_corr);
+    _obj->translateGlobal(n_corr + (w_eval(0)(0) - _obj->getPos()) );
 
   } _context->doneCurrent();
 }
@@ -163,6 +158,16 @@ void GMlibWrapper::stop() {
 
 void GMlibWrapper::setupTestScene() {
 
+  // Insert a light
+  GMlib::Point<GLfloat,3> init_light_pos( 2.0, 4.0, 10 );
+  GMlib::PointLight *pl = new GMlib::PointLight(
+                            GMlib::GMcolor::White, GMlib::GMcolor::White,
+                            GMlib::GMcolor::White, init_light_pos );
+  pl->setAttenuation(0.8, 0.002, 0.0008);
+  _gmwindow->insertLight( pl, false );
+
+  // Insert Sun
+  _gmwindow->insertSun();
 
   GMlib::Point<float,3> init_cam_pos(  0.0f, 0.0f, 0.0f );
   GMlib::Vector<float,3> init_cam_dir( 0.0f, 1.0f, 0.0f );
@@ -222,7 +227,5 @@ void GMlibWrapper::setupTestScene() {
 
   _obj_pos = GMlib::Vector<float,2>( 0.0f, 0.0f );
 
-
-
-
+  moveObj( GMlib::Vector<float,2>(0.0f,0.0f) );
 }

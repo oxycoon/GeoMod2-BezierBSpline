@@ -29,7 +29,4 @@ Window::Window(QWindow *parent) :
 
   // Create window
   create();
-
-  // Load gui qml
-  setSource( QUrl("qrc:/main.qml") );
 }

@@ -43,11 +43,15 @@ void GuiApplication::onSGInit() {
 
 
 
+  // Load gui qml
+  _window->setSource( QUrl("qrc:/main.qml") );
+
 
   QQuickItem *root_item = _window->rootObject();
   connect( root_item, SIGNAL(moveFw()),     _gmlib, SLOT(moveObjFw()) );
   connect( root_item, SIGNAL(moveBw()),     _gmlib, SLOT(moveObjBw()) );
   connect( root_item, SIGNAL(moveLeft()),   _gmlib, SLOT(moveObjLeft()) );
   connect( root_item, SIGNAL(moveRight()),  _gmlib, SLOT(moveObjRight()) );
+
 
 }
