@@ -9,7 +9,7 @@ public:
   explicit Window(QWindow *parent = 0);
 
 signals:
-  void      signSceneRenderGeometryChanged( const QRectF& new_geometry );
+  void      signSceneRenderGeometryChanged( const QString& name, const QRectF& new_geometry );
   void      signFrameReady();
 };
 

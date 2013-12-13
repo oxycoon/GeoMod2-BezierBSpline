@@ -5,15 +5,17 @@
 
 class GLSceneRenderer : public QQuickItem {
   Q_OBJECT
-
+  Q_PROPERTY(QString name READ getTexName WRITE setTexName)
 public:
   GLSceneRenderer( QQuickItem *parent = 0 );
 
-public slots:
-  void                  doUpdate();
+  const QString&        getTexName() const;
+  void                  setTexName( const QString& tex_name );
+
+  Q_INVOKABLE   void    forceRender();
 
 signals:
-  void                  signRenderGeometryChanged(const QRectF &geometry);
+  void                  signRenderGeometryChanged(const QString& name, const QRectF &geometry);
 
 protected:
   // virtual from QQuickItem
@@ -24,4 +26,5 @@ protected:
 private:
   QSize                 _tex_size;
   GMlib::GL::Texture    _tex;
+  QString               _tex_name;
 };
