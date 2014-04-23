@@ -8,7 +8,8 @@
 
 GLSceneRenderer::GLSceneRenderer(QQuickItem *parent)
   : QQuickItem(parent),
-    _tex_size(1,1)
+    _tex_size(1,1),
+    _paused(true)
 {
   setFlag(ItemHasContents);
   setSmooth(false);
@@ -25,6 +26,16 @@ void GLSceneRenderer::setTexName(const QString& tex_name) {
   forceRender();
 }
 
+bool GLSceneRenderer::isPaused() const {
+
+  return _paused;
+}
+
+void GLSceneRenderer::setPaused(bool paused) {
+
+  _paused = paused;
+}
+
 void GLSceneRenderer::forceRender() {
 
   qDebug() << "Force render! : " << _tex_name;
@@ -33,7 +44,7 @@ void GLSceneRenderer::forceRender() {
 
 QSGNode* GLSceneRenderer::updatePaintNode(QSGNode* old_node, QQuickItem::UpdatePaintNodeData*) {
 
-  if (width() <= 0 || height() <= 0 || _tex_name.length() <= 0) {
+  if (width() <= 0 || height() <= 0 || _tex_name.length() <= 0 | _paused) {
 
     delete old_node;
     return 0x0;

@@ -44,7 +44,7 @@ void GuiApplication::onSGInit() {
 
 
   // Load gui qml
-  _window->setSource( QUrl("qrc:/main.qml") );
+  _window->setSource( QUrl("qrc:/main02.qml") );
 
 
   QQuickItem *root_item = _window->rootObject();
