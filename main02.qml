@@ -14,7 +14,7 @@ Item {
   signal moveLeft
   signal moveRight
 
-  onHeightChanged: multiview.adjustSizeToRatio()
+//  onHeightChanged: multiview.adjustSizeToRatio()
 
   Q.View {
     id: singleview
@@ -27,7 +27,7 @@ Item {
     }
   }
 
-  SplitView {
+  Q.ViewSet {
     id: multiview
     anchors.fill: parent
     orientation: Qt.Vertical
@@ -36,44 +36,36 @@ Item {
     property double v_ratio : 0.5
     property bool   has_been_resized : false
 
-    onResizingChanged: {
+//    onResizingChanged: {
 
-      has_been_resized = !resizing | has_been_resized
-      if( has_been_resized && !resizing ) {
+//      has_been_resized = !resizing | has_been_resized
+//      if( has_been_resized && !resizing ) {
 
-        computeRatio()
-        has_been_resized = false
-      }
-    }
+//        computeRatio()
+//        has_been_resized = false
+//      }
+//    }
 
-    function computeRatio() {
+//    onHeightChanged: multiview.adjustSizeToRatio()
 
-      h_ratio = mv_top.height / (mv_top.height+mv_bottom.height)
-      v_ratio = mv_top.width / (mv_top.width+mv_bottom.width)
-    }
+//    function computeRatio() {
 
-    function adjustSizeToRatio() {
+//      h_ratio = mv_top.height / (mv_top.height+mv_bottom.height)
+//      v_ratio = mv_top.width / (mv_top.width+mv_bottom.width)
+//    }
 
-      console.debug("multiview has " + multiview.children.length + " children")
+//    function adjustSizeToRatio() {
 
-      console.debug("mv_top: " + mv_top )
-      console.debug("top_view_renderer: " + top_view_renderer )
+//      console.debug("multiview has " + multiview.children.length + " children")
 
-      for( var i = 0; i < multiview.children.length; ++i )
-        console.debug("bah " + i + ": " + multiview.children[i]);
+//      console.debug("mv_top: " + mv_top )
+//      console.debug("top_view_renderer: " + top_view_renderer )
 
-      mv_top.height = multiview.height * h_ratio
-      mv_top.width  = multiview.width  * v_ratio
-    }
+//      for( var i = 0; i < multiview.children.length; ++i ) console.debug("bah " + i + ": " + multiview.children[i])
 
-
-    onVisibleChanged: {
-
-      projection_view_renderer.forceRender()
-      top_view_renderer.forceRender()
-      front_view_renderer.forceRender()
-      side_view_renderer.forceRender()
-    }
+//      mv_top.height = multiview.height * h_ratio
+//      mv_top.width  = multiview.width  * v_ratio
+//    }
 
 
 

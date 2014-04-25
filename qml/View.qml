@@ -9,6 +9,7 @@ Item {
 
   property string name : ""
   property bool   resizing : false
+  property bool   has_been_resized : false
 
   signal forceRender
 
@@ -24,7 +25,7 @@ Item {
     anchors.fill: parent
     name: view.name
     visible: !view.resizing
-    paused: resizing
+    paused: false
   }
 
   Label {
@@ -34,7 +35,23 @@ Item {
    text: view.name
   }
 
+  onResizingChanged: {
+    has_been_resized = has_been_resized | resizing
+
+
+    console.debug(resizing + " : " + has_been_resized )
+
+    if( !resizing && has_been_resized ) {
+      has_been_resized = false
+      forceRender()
+    }
+
+    console.debug(resizing + " -> " + has_been_resized )
+  }
+
   Component.onCompleted: {
     view.forceRender.connect(renderer.forceRender)
   }
+
+  onVisibleChanged: forceRender()
 }

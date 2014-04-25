@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>main02.qml</file>
         <file>qml/View.qml</file>
+        <file>qml/ViewSet.qml</file>
     </qresource>
 </RCC>

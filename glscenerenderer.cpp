@@ -63,7 +63,7 @@ QSGNode* GLSceneRenderer::updatePaintNode(QSGNode* old_node, QQuickItem::UpdateP
 
   if( _tex_size != r.toRect().size() ) {
 
-    qDebug() << "old: " << _tex_size << ", new: " << r.toRect().size() << "  --> " << _tex_name;
+//    qDebug() << "old: " << _tex_size << ", new: " << r.toRect().size() << "  --> " << _tex_name;
     _tex_size = r.toRect().size();
     emit signRenderGeometryChanged(_tex_name, r );
   }
