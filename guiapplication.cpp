@@ -44,14 +44,14 @@ void GuiApplication::onSGInit() {
 
 
   // Load gui qml
-  _window->setSource( QUrl("qrc:/main02.qml") );
+  _window->setSource( QUrl("qrc:/main03.qml") );
 
 
-  QQuickItem *root_item = _window->rootObject();
-  connect( root_item, SIGNAL(moveFw()),     _gmlib, SLOT(moveObjFw()) );
-  connect( root_item, SIGNAL(moveBw()),     _gmlib, SLOT(moveObjBw()) );
-  connect( root_item, SIGNAL(moveLeft()),   _gmlib, SLOT(moveObjLeft()) );
-  connect( root_item, SIGNAL(moveRight()),  _gmlib, SLOT(moveObjRight()) );
+//  QQuickItem *root_item = _window->rootObject();
+//  connect( root_item, SIGNAL(moveFw()),     _gmlib, SLOT(moveObjFw()) );
+//  connect( root_item, SIGNAL(moveBw()),     _gmlib, SLOT(moveObjBw()) );
+//  connect( root_item, SIGNAL(moveLeft()),   _gmlib, SLOT(moveObjLeft()) );
+//  connect( root_item, SIGNAL(moveRight()),  _gmlib, SLOT(moveObjRight()) );
 
-
+//  connect( _window->rootObject(), SIGNAL(select(int,int)), _gmlib, SLOT(select(int,int)) );
 }

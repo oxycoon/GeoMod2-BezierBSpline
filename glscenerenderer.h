@@ -27,6 +27,7 @@ protected:
   void                  itemChange(ItemChange, const ItemChangeData &);
   void                  geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 
+
 private:
   QSize                 _tex_size;
   GMlib::GL::Texture    _tex;

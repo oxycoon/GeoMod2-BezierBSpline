@@ -91,3 +91,6 @@ void GLSceneRenderer::geometryChanged(const QRectF& new_geometry, const QRectF& 
 //  _tex_size = new_geometry.toRect().size();
 //  emit signRenderGeometryChanged(_tex_name,new_geometry);
 }
+
+
+

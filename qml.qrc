@@ -4,5 +4,10 @@
         <file>main02.qml</file>
         <file>qml/View.qml</file>
         <file>qml/ViewSet.qml</file>
+        <file>main03.qml</file>
+        <file>qml/NewView.qml</file>
+        <file>qml/NewViewSet.qml</file>
+        <file>qml/MySplitView.qml</file>
+        <file>qml/MySplitView2.qml</file>
     </qresource>
 </RCC>

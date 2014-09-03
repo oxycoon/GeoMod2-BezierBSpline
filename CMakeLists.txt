@@ -46,6 +46,7 @@ set( HDRS
   gmlibwrapper.h
   guiapplication.h
   window.h
+  testtorus.h
   )
 
 set( SRCS
@@ -85,3 +86,5 @@ target_link_libraries( ${CMAKE_PROJECT_NAME}
   ${GLEW_LIBRARIES}
   ${OPENGL_LIBRARIES}
   )
+
+set_target_properties( ${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS "--std=c++11" )

@@ -3,6 +3,8 @@ namespace GMlib {
 
   class Scene;
   class Camera;
+  class DefaultRenderer;
+  class SelectRenderer;
 
   template<typename T, int n>
   class PSurf;
@@ -15,6 +17,7 @@ namespace GMlib {
 class QOpenGLContext;
 class QOffscreenSurface;
 class QOpenGLFramebufferObject;
+
 
 class GMlibWrapper : public QObject {
   Q_OBJECT
@@ -36,6 +39,8 @@ public slots:
   void                      moveObjLeft();
   void                      moveObjRight();
 
+  void                      select( int x, int y );
+
 protected:
   void                      timerEvent(QTimerEvent *e);
 
@@ -44,6 +49,13 @@ private:
   QOpenGLContext*           _context;
   QOffscreenSurface*        _offscreensurface;
   GMlib::Scene*             _scene;
+
+  GMlib::DefaultRenderer*   _proj_renderer;
+  GMlib::DefaultRenderer*   _front_renderer;
+  GMlib::DefaultRenderer*   _side_renderer;
+  GMlib::DefaultRenderer*   _top_renderer;
+
+  GMlib::SelectRenderer*    _select_renderer;
 
 
   GMlib::PSurf<float,3>*    _world;
