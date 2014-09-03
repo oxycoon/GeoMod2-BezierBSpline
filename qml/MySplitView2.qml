@@ -335,12 +335,20 @@ Item {
                 if( item.visible || i == d.fillIndex) {
                   item[d.offset] = lastVisibleHandle ? lastVisibleHandle[d.offset] + lastVisibleHandle[d.size] : 0
                   item[d.otherOffset] = 0
-                  item[d.otherSize] = root[otherSize]
+                  item[d.otherSize] = splitterItems[d.otherSize]
 
                   if(handle && handle.visible)
-                    item[d.size] = lastVisibleHandle ? handle[d.offset] - lastVisibleHandle[d.offset] : handle[d.offset]
+                    item[d.size] = lastVisibleHandle ? handle[d.offset] - lastVisibleHandle[d.offset] - lastVisibleHandle[d.size]
+ : handle[d.offset]
                   else
-                    item[d.size] = root[d.size]
+                    item[d.size] = root[d.size] - lastVisibleHandle[d.offset] - lastVisibleHandle[d.size]
+
+
+                  console.debug("item [" + i + "]")
+                  console.debug("  s:  " + item[d.size])
+                  console.debug("  os: " + item[d.otherSize])
+
+
                   lastVisibleItem = item
                 }
                 lastVisibleHandle = handle
