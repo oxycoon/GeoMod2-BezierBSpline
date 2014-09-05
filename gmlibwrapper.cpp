@@ -274,7 +274,6 @@ void GMlibWrapper::setupTestScene() {
 
   moveObj( GMlib::Vector<float,2>(0.0f,0.0f) );
 
-  _obj->setSelected(true);
 }
 
 

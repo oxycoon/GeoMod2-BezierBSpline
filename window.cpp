@@ -1,5 +1,10 @@
 #include "window.h"
 
+
+//qt
+#include <QQuickItem>
+#include <QDebug>
+
 Window::Window(QWindow *parent) :
   QQuickView(parent) {
 
@@ -29,4 +34,15 @@ Window::Window(QWindow *parent) :
 
   // Create window
   create();
+}
+
+void Window::resizeEvent(QResizeEvent* e) {
+
+  qDebug() << "Resizing";
+
+  if( !rootObject() )
+    return;
+  rootObject()->setProperty("resizing", true );
+  QQuickView::resizeEvent(e);
+  rootObject()->setProperty("resizing", false );
 }

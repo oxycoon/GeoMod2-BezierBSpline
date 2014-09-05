@@ -8,6 +8,7 @@
         <file>qml/NewView.qml</file>
         <file>qml/NewViewSet.qml</file>
         <file>qml/MySplitView.qml</file>
-        <file>qml/MySplitView2.qml</file>
+        <file>qml/RelativeSplitView.qml</file>
+        <file>qml/DefaultRenderWindow.qml</file>
     </qresource>
 </RCC>

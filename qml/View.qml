@@ -12,6 +12,7 @@ Item {
   property bool   has_been_resized : false
 
   signal forceRender
+  signal doubleClicked
 
   Rectangle {
     id: bah
@@ -26,13 +27,25 @@ Item {
     name: view.name
     visible: !view.resizing
     paused: false
+
+    Label {
+     anchors.top: parent.top
+     anchors.left: parent.left
+     anchors.margins: 5
+
+     text: view.name
+    }
   }
 
-  Label {
-   anchors.top: parent.top
-   anchors.left: parent.left
-   anchors.margins: 5
-   text: view.name
+
+  FocusScope {
+    anchors.fill: parent
+
+    MouseArea {
+      anchors.fill: parent
+      focus: true
+      onDoubleClicked: view.doubleClicked()
+    }
   }
 
   onResizingChanged: {
@@ -49,9 +62,7 @@ Item {
     console.debug(resizing + " -> " + has_been_resized )
   }
 
-  Component.onCompleted: {
-    view.forceRender.connect(renderer.forceRender)
-  }
-
   onVisibleChanged: forceRender()
+
+  Component.onCompleted: view.forceRender.connect(renderer.forceRender)
 }

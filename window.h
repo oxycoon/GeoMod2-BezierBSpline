@@ -8,6 +8,10 @@ class Window : public QQuickView {
 public:
   explicit Window(QWindow *parent = 0);
 
+
+protected:
+  void      resizeEvent(QResizeEvent *e);
+
 signals:
   void      signSceneRenderGeometryChanged( const QString& name, const QRectF& new_geometry );
   void      signFrameReady();
