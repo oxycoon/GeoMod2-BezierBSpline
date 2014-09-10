@@ -3,7 +3,7 @@
 #include "glscenerenderer.h"
 
 // gmlib
-#include <core/gmGlobal>
+#include <core/gmglobal>
 
 // qt
 #include <QDebug>

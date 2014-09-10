@@ -2,6 +2,10 @@
 
 // local
 #include "window.h"
+#include "guiapplication.h"
+
+// hidmanager
+//#include <standardhidmanager.h>
 
 // Qt
 #include <QSGSimpleTextureNode>
@@ -38,7 +42,7 @@ void GLSceneRenderer::setPaused(bool paused) {
 
 void GLSceneRenderer::forceRender() {
 
-  qDebug() << "Force render! : " << _tex_name;
+//  qDebug() << "Force render! : " << _tex_name;
   emit signRenderGeometryChanged(_tex_name, boundingRect() );
 }
 
@@ -68,6 +72,7 @@ QSGNode* GLSceneRenderer::updatePaintNode(QSGNode* old_node, QQuickItem::UpdateP
     emit signRenderGeometryChanged(_tex_name, r );
   }
 
+
   return node;
 }
 
@@ -89,8 +94,5 @@ void GLSceneRenderer::itemChange(QQuickItem::ItemChange change, const QQuickItem
 void GLSceneRenderer::geometryChanged(const QRectF& new_geometry, const QRectF& /*oldGeometry*/) {
 
 //  _tex_size = new_geometry.toRect().size();
-//  emit signRenderGeometryChanged(_tex_name,new_geometry);
+  //  emit signRenderGeometryChanged(_tex_name,new_geometry);
 }
-
-
-

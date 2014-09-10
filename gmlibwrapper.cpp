@@ -5,7 +5,7 @@
 
 
 // GMlib
-#include <gmOpenGLModule>
+#include <gmOpenglModule>
 #include <gmSceneModule>
 #include <gmParametricsModule>
 
@@ -40,26 +40,20 @@ GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context, const QSize &render_size
     // Setup and init the GMlib GMWindow
     _scene = new GMlib::Scene;
 
-    _proj_renderer = new GMlib::DefaultRenderer;
-    _proj_renderer->setRenderTarget(new GMlib::RenderTexture("projection_camera"));
+    _proj_renderer = new GMlib::DefaultRendererWithSelect;
+    _proj_renderer->setRenderTarget(new GMlib::RenderTexture("Projection"));
+//    _proj_renderer->setSelectRboName("select_proj");
 
-    _front_renderer = new GMlib::DefaultRenderer;
-    _front_renderer->setRenderTarget(new GMlib::RenderTexture("front_camera"));
+    _front_renderer = new GMlib::DefaultRendererWithSelect;
+    _front_renderer->setRenderTarget(new GMlib::RenderTexture("Front"));
 
-    _side_renderer = new GMlib::DefaultRenderer;
-    _side_renderer->setRenderTarget(new GMlib::RenderTexture("side_camera"));
+    _side_renderer = new GMlib::DefaultRendererWithSelect;
+    _side_renderer->setRenderTarget(new GMlib::RenderTexture("Side"));
 
-    _top_renderer = new GMlib::DefaultRenderer;
-    _top_renderer->setRenderTarget(new GMlib::RenderTexture("top_camera"));
-
-    _select_renderer = new GMlib::SelectRenderer;
-
-    // Setup a texture render target and resize the window
-//    _scene->setRenderTarget( new GMlib::RenderTexture("display_render_target") );
+    _top_renderer = new GMlib::DefaultRendererWithSelect;
+    _top_renderer->setRenderTarget(new GMlib::RenderTexture("Top"));
 
     setupTestScene();
-
-//    _gmwindow->reshape( _tex_size.width(), _tex_size.height() );
 
   } _context->doneCurrent();
 }
@@ -80,44 +74,19 @@ void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& new_g
 
   _context->makeCurrent(_offscreensurface); {
 
-    if( name == "projection_camera" && _proj_cam ) {
+    if( name == "Projection" && _proj_cam ) {
       _proj_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-      _select_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
     }
-    else if( name == "front_camera" && _front_cam )
+    else if( name == "Front" && _front_cam )
       _front_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-    else if( name == "side_camera" && _side_cam )
+    else if( name == "Side" && _side_cam )
       _side_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-    else if( name == "top_camera" && _top_cam )
+    else if( name == "Top" && _top_cam )
       _top_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
 
   } _context->doneCurrent();
 
   start();
-}
-
-void GMlibWrapper::moveObjFw() {
-
-  qDebug() << "Move obj Fw";
-  moveObj( GMlib::Vector<float,2>( 0.05, 0.0 ) );
-}
-
-void GMlibWrapper::moveObjBw() {
-
-  qDebug() << "Move obj Bw";
-  moveObj( GMlib::Vector<float,2>( -0.05, 0.0 ) );
-}
-
-void GMlibWrapper::moveObjLeft() {
-
-  qDebug() << "Move obj Left";
-  moveObj( GMlib::Vector<float,2>( 0.0, -0.05 ) );
-}
-
-void GMlibWrapper::moveObjRight() {
-
-  qDebug() << "Move obj Right";
-  moveObj( GMlib::Vector<float,2>( 0.0, 0.05 ) );
 }
 
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
@@ -223,13 +192,6 @@ void GMlibWrapper::setupTestScene() {
   _top_cam->setCuttingPlanes( 1.0f, 8000.0f );
   //  _top_cam->zoom( 10.0 );
 
-
-//  _proj_cam->getRenderer()->setRenderTarget( new GMlib::RenderTexture("projection_camera") );
-//  _front_cam->getRenderer()->setRenderTarget( new GMlib::RenderTexture("front_camera") );
-//  _side_cam->getRenderer()->setRenderTarget( new GMlib::RenderTexture("side_camera") );
-//  _top_cam->getRenderer()->setRenderTarget( new GMlib::RenderTexture("top_camera") );
-
-
   _scene->insertCamera( _proj_cam );
   _scene->insertCamera( _front_cam );
   _scene->insertCamera( _side_cam );
@@ -240,22 +202,6 @@ void GMlibWrapper::setupTestScene() {
   _front_renderer->setCamera(_front_cam);
   _side_renderer->setCamera(_side_cam);
   _top_renderer->setCamera(_top_cam);
-
-
-  _select_renderer->setCamera(_proj_cam);
-
-
-//  int cam_project_idx = _gmwindow->getCameraIndex( cam_project );
-//  int cam_front_idx   = _gmwindow->getCameraIndex( cam_front );
-//  int cam_side_idx    = _gmwindow->getCameraIndex( cam_side );
-//  int cam_top_idx     = _gmwindow->getCameraIndex( cam_top );
-
-
-//  _gmwindow->addViewSet( cam_project_idx );
-//  _gmwindow->addToViewSet( cam_top_idx, cam_project_idx, false );
-//  _gmwindow->addToViewSet( cam_front_idx, cam_top_idx, true );
-//  _gmwindow->addToViewSet( cam_side_idx, cam_front_idx, false );
-
 
   _obj_pos = GMlib::Vector<float,2>( 0.0f, 0.0f );
 
@@ -276,6 +222,11 @@ void GMlibWrapper::setupTestScene() {
 
 }
 
+GMlib::Scene*GMlibWrapper::getScene() const {
+
+  return _scene;
+}
+
 
 
 void GMlibWrapper::select(int x, int y) {
@@ -285,13 +236,13 @@ void GMlibWrapper::select(int x, int y) {
 
   _context->makeCurrent(_offscreensurface ); {
 
-    y = _select_renderer->getViewportH() - y - 1;
+    y = _proj_renderer->getViewportH() - y - 1;
 
     qDebug() << "Select: " << x << " " << y;
 
-    _select_renderer->select(-GMlib::GM_SO_TYPE_SELECTOR);
+    _proj_renderer->select(-GMlib::GM_SO_TYPE_SELECTOR);
 
-    GMlib::DisplayObject* so = _select_renderer->findObject(x,y);
+    GMlib::DisplayObject* so = _proj_renderer->findObject(x,y);
     if( so ) {
       qDebug() << "DO found: " << so->getIdentity().c_str();
       so->toggleSelected();

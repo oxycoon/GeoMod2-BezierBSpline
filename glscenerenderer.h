@@ -1,4 +1,4 @@
-#include <opengl/gmTexture>
+#include <opengl/gmtexture>
 
 #include <QtQuick/QQuickItem>
 #include <QtCore/QPropertyAnimation>
@@ -18,6 +18,8 @@ public:
 
   Q_INVOKABLE   void    forceRender();
 
+
+
 signals:
   void                  signRenderGeometryChanged(const QString& name, const QRectF &geometry);
 
@@ -27,11 +29,11 @@ protected:
   void                  itemChange(ItemChange, const ItemChangeData &);
   void                  geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 
-
 private:
   QSize                 _tex_size;
   GMlib::GL::Texture    _tex;
   QString               _tex_name;
 
   bool                  _paused;
+
 };

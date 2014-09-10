@@ -50,10 +50,10 @@ Item {
         function init()
         {
 
-          console.debug("d.init()")
-          console.debug("  root.size: " + root[d.size])
-          console.debug("  root.implicitSize: " + root[d.implicitSize])
-          console.debug("  items+handles size: " + splitterItems[d.size] + splitterHandles[d.size])
+//          console.debug("d.init()")
+//          console.debug("  root.size: " + root[d.size])
+//          console.debug("  root.implicitSize: " + root[d.implicitSize])
+//          console.debug("  items+handles size: " + splitterItems[d.size] + splitterHandles[d.size])
           var i
             for (i=0; i<__contents.length; ++i) {
                 var item = __contents[i];
@@ -69,8 +69,8 @@ Item {
                 item.widthChanged.connect(d.updateLayout)
                 item.heightChanged.connect(d.updateLayout)
             }
-          console.debug("  No. items: " + __items.length)
-          console.debug("  No. handles: " + __handles.length)
+//          console.debug("  No. items: " + __items.length)
+//          console.debug("  No. handles: " + __handles.length)
 
             for( i = 0; i < __handles.length; ++i)
               __handles[i].relativeOffset = i === 0 ? 1.0 / __items.length : __handles[i-1].relativeOffset + 1.0 / __items.length
@@ -119,7 +119,7 @@ Item {
         function updateLayout()
         {
 
-          console.debug("UPDATE LAYOUTS")
+//          console.debug("UPDATE LAYOUTS")
 
             // This function will reposition both handles and
             // items according to the their width/height:
@@ -129,11 +129,11 @@ Item {
                 return
             d.updateLayoutGuard = true
 
-          console.debug("UPDATE LAYOUTS - PAST GUARDS")
-          console.debug("No. Handles: " + __handles.length )
-          console.debug("No. Items: " + __items.length )
+//          console.debug("UPDATE LAYOUTS - PAST GUARDS")
+//          console.debug("No. Handles: " + __handles.length )
+//          console.debug("No. Items: " + __items.length )
           for( var i2 = 0; i2 < __handles.length; ++i2 )
-            console.debug("  handle[" + i2 + "] rel offset: " + __handles[i2].relativeOffset)
+//            console.debug("  handle[" + i2 + "] rel offset: " + __handles[i2].relativeOffset)
 
             // Position items and handles according to the relative handle positions
             var lastVisibleItem, lastVisibleHandle, handle, item
@@ -143,7 +143,7 @@ Item {
                 handle = __handles[i]
                 if (handle && handle.visible) {
                     handle[d.offset] = handle.relativeOffset * root[d.size]
-                    console.debug("HANDLE OFFSET[" + i + "]: " + handle[d.offset])
+//                    console.debug("HANDLE OFFSET[" + i + "]: " + handle[d.offset])
                     handle[d.otherOffset] = 0
                     handle[d.otherSize] = root[d.otherSize]
                 }
@@ -160,9 +160,9 @@ Item {
                     item[d.size] = root[d.size] - lastVisibleHandle[d.offset] - lastVisibleHandle[d.size]
 
 
-                  console.debug("item [" + i + "]")
-                  console.debug("  s:  " + item[d.size])
-                  console.debug("  os: " + item[d.otherSize])
+//                  console.debug("item [" + i + "]")
+//                  console.debug("  s:  " + item[d.size])
+//                  console.debug("  os: " + item[d.otherSize])
 
 
                   lastVisibleItem = item
@@ -220,10 +220,10 @@ Item {
                 if (d.updateLayoutGuard)
                     return
 
-                console.debug("Parent size: " + root[d.size])
-                console.debug(" handle offset: " + this[d.offset])
-                console.debug(" relative: " + this[d.offset]/root[d.size])
-                console.debug(" index: " + __handleIndex)
+//                console.debug("Parent size: " + root[d.size])
+//                console.debug(" handle offset: " + this[d.offset])
+//                console.debug(" relative: " + this[d.offset]/root[d.size])
+//                console.debug(" index: " + __handleIndex)
 
                 relativeOffset = this[d.offset]/ Math.max(root[d.size],root[d.implicitSize])
             }

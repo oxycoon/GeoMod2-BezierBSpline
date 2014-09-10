@@ -3,13 +3,12 @@ namespace GMlib {
 
   class Scene;
   class Camera;
-  class DefaultRenderer;
-  class SelectRenderer;
+  class DefaultRendererWithSelect;
 
   template<typename T, int n>
   class PSurf;
 }
-#include "core/gmPoint"
+#include "core/gmpoint"
 
 // qt
 #include <QObject>
@@ -30,14 +29,11 @@ public:
 
   void                      setupTestScene();
 
+
+  GMlib::Scene*             getScene() const;
+
 public slots:
   void                      changeRenderGeometry( const QString& name, const QRectF &new_geometry );
-
-
-  void                      moveObjFw();
-  void                      moveObjBw();
-  void                      moveObjLeft();
-  void                      moveObjRight();
 
   void                      select( int x, int y );
 
@@ -50,12 +46,10 @@ private:
   QOffscreenSurface*        _offscreensurface;
   GMlib::Scene*             _scene;
 
-  GMlib::DefaultRenderer*   _proj_renderer;
-  GMlib::DefaultRenderer*   _front_renderer;
-  GMlib::DefaultRenderer*   _side_renderer;
-  GMlib::DefaultRenderer*   _top_renderer;
-
-  GMlib::SelectRenderer*    _select_renderer;
+  GMlib::DefaultRendererWithSelect*   _proj_renderer;
+  GMlib::DefaultRendererWithSelect*   _front_renderer;
+  GMlib::DefaultRendererWithSelect*   _side_renderer;
+  GMlib::DefaultRendererWithSelect*   _top_renderer;
 
 
   GMlib::PSurf<float,3>*    _world;

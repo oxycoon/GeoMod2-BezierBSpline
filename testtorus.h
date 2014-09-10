@@ -2,7 +2,7 @@
 #define TESTTORUS_H
 
 
-#include <parametrics/gmPTorus>
+#include <parametrics/gmptorus>
 
 
 class TestTorus : public GMlib::PTorus<float> {

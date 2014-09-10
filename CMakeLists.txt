@@ -29,14 +29,22 @@ find_package(Qt5Gui 5.1)
 ################################
 # Find GMlib
 find_package(
-  GMlib 0.4 EXACT
+  GMlib 0.5 EXACT
   PATHS ${GMLIB_DIR}
   NO_DEFAULT_PATH
 )
+include_directories( ${GMlib_INCLUDE_DIRS} )
+link_directories( ${GMlib_LINK_DIRS} )
+add_definitions(${GMlib_DEFINITIONS})
+
 include_directories( ${GLEW_INCLUDE_DIRS} )
 if(WIN32)
   add_definitions(-DGLEW_STATIC)
 endif(WIN32)
+
+
+#add_subdirectory(hidmanager)
+#include_directories(hidmanager)
 
 #######
 # Files
@@ -79,7 +87,8 @@ add_executable( ${CMAKE_PROJECT_NAME} ${HDRS} ${SRCS} ${HDRS_MOC} ${FORM_HDRS} $
 ######
 # Link
 target_link_libraries( ${CMAKE_PROJECT_NAME}
-  ${GMLIB_LIBRARIES}
+#  hidmanager
+  ${GMlib_LIBRARIES}
   Qt5::Core
   Qt5::Quick
   Qt5::Gui
