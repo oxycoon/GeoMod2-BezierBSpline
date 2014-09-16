@@ -27,7 +27,7 @@ public:
   void                      start();
   void                      stop();
 
-  void                      setupTestScene();
+  void                      initScene();
 
 
   GMlib::Scene*             getScene() const;

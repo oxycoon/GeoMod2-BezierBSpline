@@ -31,11 +31,11 @@ Item {
     id: scope
     anchors.fill: parent
 
-    GLSceneRenderer {
+    GLSceneRendererNoTexture {
       id: renderer
       anchors.fill: parent
       name: root.name
-      visible: !root.resizing
+//      visible: !root.resizing
       paused: false
 
       Label {
@@ -87,5 +87,5 @@ Item {
     property bool   has_been_resized : false
   }
 
-  Component.onCompleted: root.forceRender.connect(renderer.forceRender)
+//  Component.onCompleted: root.forceRender.connect(renderer.forceRender)
 }

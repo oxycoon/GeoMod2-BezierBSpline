@@ -51,6 +51,7 @@ endif(WIN32)
 
 set( HDRS
   glscenerenderer.h
+  glscenerenderer2.h
   gmlibwrapper.h
   guiapplication.h
   window.h
@@ -59,6 +60,7 @@ set( HDRS
 
 set( SRCS
   glscenerenderer.cpp
+  glscenerenderer2.cpp
   gmlibwrapper.cpp
   guiapplication.cpp
   main.cpp
@@ -69,6 +71,7 @@ set( SRCS
 # Moc'ing
 QT5_WRAP_CPP( HDRS_MOC
   glscenerenderer.h
+  glscenerenderer2.h
   gmlibwrapper.h
   guiapplication.h
   window.h
