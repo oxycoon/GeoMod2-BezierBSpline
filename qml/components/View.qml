@@ -38,15 +38,17 @@ Item {
       visible: !root.resizing
       paused: false
 
-
       Label {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.margins: 5
         text: root.name
-
+        color: "white"
+        font {
+          bold: true
+          weight: Font.Black
+        }
       }
-
     }
 
     Keys.onPressed:  root.keyPressed(root.name,event.key,event.modifiers)
@@ -82,9 +84,7 @@ Item {
 
   QtObject {
     id: d
-
     property bool   has_been_resized : false
-
   }
 
   Component.onCompleted: root.forceRender.connect(renderer.forceRender)

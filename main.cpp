@@ -1,6 +1,7 @@
 // local
 #include "guiapplication.h"
 #include "glscenerenderer.h"
+//#include "glscenerenderer2.h"
 
 // gmlib
 #include <core/gmglobal>
@@ -39,6 +40,7 @@ int main(int argc, char *argv[]) {
 
   // Register modules
   qmlRegisterType<GLSceneRenderer>( "MyCustomQuick", 1, 0, "GLSceneRenderer" );
+//  qmlRegisterType<GLSceneRenderer2>( "MyCustomQuick", 1, 0, "GLSceneRendererNoTexture" );
 
   // Create the application object
   GuiApplication a(argc, argv);
