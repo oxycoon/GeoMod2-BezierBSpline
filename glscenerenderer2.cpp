@@ -1,8 +1,8 @@
 #include "glscenerenderer2.h"
+#include "window.h"
 
 // Qt
 #include <QQuickWindow>
-
 
 // stl
 #include <iostream>
@@ -13,24 +13,27 @@
 
 
 
-GLSceneRenderer2::GLSceneRenderer2() : _renderer{nullptr}, _tex_name{}, _paused{true} {
+GLSceneRenderer2::GLSceneRenderer2() : _renderer{nullptr}, _name{}, _paused{true} {
 
   connect( this, &QQuickItem::windowChanged, this, &GLSceneRenderer2::handleWindowChanged );
 }
 
-const QString&  GLSceneRenderer2::getTexName() const {
+const
+QString&  GLSceneRenderer2::getTexName() const {
 
-  return _tex_name;
+  return _name;
 }
 
-void GLSceneRenderer2::setTexName(const QString& tex_name) {
+void
+GLSceneRenderer2::setTexName(const QString& name) {
 
-  _tex_name = tex_name;
+  _name = name;
   if(_renderer)
-    _renderer->setTexName(tex_name.toStdString());
+    _renderer->setTexName(_name.toStdString());
 }
 
-bool GLSceneRenderer2::isPaused() const {
+bool
+GLSceneRenderer2::isPaused() const {
 
   return _paused;
 }
@@ -43,16 +46,21 @@ void GLSceneRenderer2::setPaused(bool paused) {
 void
 GLSceneRenderer2::sync() {
 
-  if(!_renderer && _tex_name.length() > 0) {
-    _renderer = std::unique_ptr<Private::Renderer>(new Private::Renderer(_tex_name.toStdString()));
+
+  if(!_renderer && _name.length() > 0) {
+    _renderer = std::unique_ptr<Private::Renderer>(new Private::Renderer(_name.toStdString()));
     connect( window(), &QQuickWindow::beforeRendering, _renderer.get(), &Private::Renderer::paint, Qt::DirectConnection );
   }
 
   if( !_renderer )
     return;
 
-  _renderer->setViewport( mapRectToScene(boundingRect()) );
-  qDebug() << "Sync: " << _tex_name << ", bb: " << boundingRect();
+  QRectF r = mapRectToScene(boundingRect());
+  QRectF cr(r.left(),window()->height()-r.bottom(), r.width(), r.height());
+//  _renderer->setViewport(r.left(),window()->height()-r.bottom(), r.width(), r.height() );
+  _renderer->setViewport(cr);
+
+  emit signViewportChanged(_name,r);
 }
 
 void
@@ -66,8 +74,10 @@ GLSceneRenderer2::handleWindowChanged(QQuickWindow* window) {
 
   if( !window ) return;
 
-  connect( window, &QQuickWindow::beforeSynchronizing, this, &GLSceneRenderer2::sync );
-  connect( window, &QQuickWindow::sceneGraphInvalidated, this, &GLSceneRenderer2::cleanup );
-//  window->setClearBeforeRendering(false);
+  Window *w = dynamic_cast<Window*>(window);
+  if( !w ) return;
 
+  connect( w, &QQuickWindow::beforeSynchronizing, this, &GLSceneRenderer2::sync );
+  connect( w, &QQuickWindow::sceneGraphInvalidated, this, &GLSceneRenderer2::cleanup );
+  connect( this, &GLSceneRenderer2::signViewportChanged, w, &Window::signGuiViewportChanged );
 }

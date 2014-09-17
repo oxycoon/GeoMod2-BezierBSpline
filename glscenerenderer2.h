@@ -17,6 +17,7 @@
 
 // stl
 #include <memory>
+#include <mutex>
 
 
 namespace Private {
@@ -30,7 +31,7 @@ namespace Private {
 
   public slots:
     void      paint() {
-      qDebug() << "Painting on viewport: " << _viewport << ", tex id: " << _tex.getId();
+//      qDebug() << "Painting on viewport: " << _viewport << ", tex id: " << _tex.getId();
 
       if( !_prog.isValid() ) {
         std::cout << "Prog ! valid: setting up." << std::endl;
@@ -92,7 +93,7 @@ namespace Private {
       }
 
 
-      std::cout << "Prog OK!" << std::endl;
+//      std::cout << "Prog OK!" << std::endl;
 
 
 
@@ -127,70 +128,9 @@ namespace Private {
 
       } _prog.unbind();
 
-
-
-
-
-
-//      if( !_prog ) {
-
-//        _prog = std::unique_ptr<QOpenGLShaderProgram>( new QOpenGLShaderProgram );
-//        _prog->addShaderFromSourceCode(QOpenGLShader::Vertex,
-//                                                   "attribute highp vec4 vertices;"
-//                                                   "varying highp vec2 coords;"
-//                                                   "void main() {"
-//                                                   "    gl_Position = vertices;"
-//                                                   "    coords = vertices.xy;"
-//                                                   "}");
-//          _prog->addShaderFromSourceCode(QOpenGLShader::Fragment,
-//                                             "uniform lowp float t;"
-//                                             "varying highp vec2 coords;"
-//                                             "void main() {"
-//                                             "    lowp float i = 1. - (pow(abs(coords.x), 4.) + pow(abs(coords.y), 4.));"
-//                                             "    i = smoothstep(t - 0.8, t + 0.8, i);"
-//                                             "    i = floor(i * 20.) / 20.;"
-//                                             "    gl_FragColor = vec4(coords * .5 + .5, i, i);"
-//                                             "}");
-
-//          _prog->bindAttributeLocation("vertices", 0);
-//          _prog->link();
-
-
-//      }
-//      _prog->bind();
-
-//      _prog->enableAttributeArray(0);
-
-//      const float values[] = {
-//          -1, -1,
-//          1, -1,
-//          -1, 1,
-//          1, 1
-//      };
-//      _prog->setAttributeArray(0, GL_FLOAT, values, 2);
-//      _prog->setUniformValue("t", 0.5f);
-
-//      glViewport(_viewport.x(), _viewport.y(), _viewport.width(), _viewport.height());
-
-//      glDisable(GL_DEPTH_TEST);
-
-////      glClearColor(0, 0, 0, 1);
-////      glClear(GL_COLOR_BUFFER_BIT);
-
-//      glDisable(GL_BLEND);
-////      glEnable(GL_BLEND);
-////      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-//      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-//      _prog->disableAttributeArray(0);
-//      _prog->release();
-
-
-
-
     }
     void      setViewport( const QRectF& rect ) { _viewport = rect; }
+    void      setViewport( int x, int y, int w, int h ) { _viewport = QRectF(x,y,w,h); }
 
   private:
     QRectF                          _viewport;
@@ -231,7 +171,7 @@ public slots:
 protected:
   void      geometryChanged(const QRectF &newGeometry, const QRectF&) {
 
-    qDebug() << "Geometry changed of: " << _tex_name << ", geo: " << mapRectToScene(newGeometry);
+//    qDebug() << "Geometry changed of: " << _tex_name << ", geo: " << mapRectToScene(newGeometry);
   }
 
 private slots:
@@ -239,8 +179,12 @@ private slots:
 
 private:
   std::unique_ptr<Private::Renderer>      _renderer;
-  QString                                 _tex_name;
+  QString                                 _name;
   bool                                    _paused;
+
+signals:
+  void      signViewportChanged( const QString& name, const QRectF& size );
+
 
 
 };

@@ -146,8 +146,8 @@ void GLSceneRenderer::itemChange(QQuickItem::ItemChange change, const QQuickItem
       Window *w = qobject_cast<Window*>(window());
       connect( w,     &Window::signFrameReady,
                this,  &GLSceneRenderer::update );
-      connect( this,  &GLSceneRenderer::signRenderGeometryChanged,
-               w,     &Window::signSceneRenderGeometryChanged );
+//      connect( this,  &GLSceneRenderer::signRenderGeometryChanged,
+//               w,     &Window::signSceneRenderGeometryChanged );
     }
   }
 }

@@ -24,7 +24,7 @@ Item {
     id: bah
     color: "gray"
     anchors.fill: parent
-    visible: root.resizing
+    visible: false // root.resizing
   }
 
   FocusScope {

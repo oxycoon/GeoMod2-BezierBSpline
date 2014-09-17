@@ -95,6 +95,7 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
   if( !_context->isValid() )
     return;
 
+
   e->accept();
 
   _context->makeCurrent(_offscreensurface); {

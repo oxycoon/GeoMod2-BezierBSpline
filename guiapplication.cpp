@@ -43,7 +43,7 @@ void GuiApplication::onSGInit() {
   _gmlib = new GMlibWrapper( ctx, _window->size() );
   connect( _gmlib,  &GMlibWrapper::signFrameReady,
            _window, &Window::signFrameReady );
-  connect( _window, &Window::signSceneRenderGeometryChanged,
+  connect( _window, &Window::signGuiViewportChanged,
            _gmlib,  &GMlibWrapper::changeRenderGeometry );
 
   _gmlib->start();

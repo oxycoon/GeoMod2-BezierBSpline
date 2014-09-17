@@ -8,6 +8,7 @@
 Window::Window(QWindow *parent) :
   QQuickView(parent) {
 
+  // Turn off clear before rendering !!!!!!!!!!!!!
   setClearBeforeRendering(false);
 
   // Set rendering surface type to GL surface
