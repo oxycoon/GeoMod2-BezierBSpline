@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
   // Register modules
   qmlRegisterType<GLSceneRenderer>( "MyCustomQuick", 1, 0, "GLSceneRenderer" );
-  qmlRegisterType<GLSceneRenderer2>( "MyCustomQuick", 1, 0, "GLSceneRendererNoTexture" );
+  qmlRegisterType<GLSceneRenderer2>( "MyCustomQuick", 1, 0, "GLSceneRendererNoQSGTexture" );
 
   // Create the application object
   GuiApplication a(argc, argv);

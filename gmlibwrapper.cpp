@@ -53,7 +53,10 @@ GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context, const QSize &render_size
     _top_renderer = new GMlib::DefaultRendererWithSelect;
     _top_renderer->setRenderTarget(new GMlib::RenderTexture("Top"));
 
+
   } _context->doneCurrent();
+
+  initScene();
 }
 
 GMlibWrapper::~GMlibWrapper() {
@@ -197,11 +200,16 @@ void GMlibWrapper::initScene() {
     _scene->insertCamera( _side_cam );
     _scene->insertCamera( _top_cam );
 
-
     _proj_renderer->setCamera(_proj_cam);
     _front_renderer->setCamera(_front_cam);
     _side_renderer->setCamera(_side_cam);
     _top_renderer->setCamera(_top_cam);
+
+    int init_size = 600;
+    _proj_renderer->setViewport(0,0,init_size,init_size);
+    _front_renderer->setViewport(0,0,init_size,init_size);
+    _side_renderer->setViewport(0,0,init_size,init_size);
+    _top_renderer->setViewport(0,0,init_size,init_size);
 
     _obj_pos = GMlib::Vector<float,2>( 0.0f, 0.0f );
 

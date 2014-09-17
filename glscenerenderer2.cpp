@@ -68,6 +68,6 @@ GLSceneRenderer2::handleWindowChanged(QQuickWindow* window) {
 
   connect( window, &QQuickWindow::beforeSynchronizing, this, &GLSceneRenderer2::sync );
   connect( window, &QQuickWindow::sceneGraphInvalidated, this, &GLSceneRenderer2::cleanup );
-  window->setClearBeforeRendering(false);
+//  window->setClearBeforeRendering(false);
 
 }

@@ -33,6 +33,10 @@ find_package(
   PATHS ${GMLIB_DIR}
   NO_DEFAULT_PATH
 )
+message( "GMlib_INCLUDE_DIRS: ${GMlib_INCLUDE_DIRS}" )
+message( "GMlib_LINK_DIRS:    ${GMlib_LINK_DIRS}" )
+message( "GMlib_DEFINITIONS:  ${GMlib_DEFINITIONS}" )
+message( "GMlib_LIBRARIES:    ${GMlib_LIBRARIES}" )
 include_directories( ${GMlib_INCLUDE_DIRS} )
 link_directories( ${GMlib_LINK_DIRS} )
 add_definitions(${GMlib_DEFINITIONS})

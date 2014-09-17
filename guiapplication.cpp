@@ -48,8 +48,6 @@ void GuiApplication::onSGInit() {
 
   _gmlib->start();
 
-  _gmlib->initScene();
-
   // Load gui qml
   _window->setSource( QUrl("qrc:/qml/main.qml") );
 

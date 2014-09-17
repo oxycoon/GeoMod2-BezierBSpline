@@ -31,11 +31,12 @@ Item {
     id: scope
     anchors.fill: parent
 
-    GLSceneRendererNoTexture {
+    //    GLSceneRenderer {
+    GLSceneRendererNoQSGTexture {
       id: renderer
       anchors.fill: parent
       name: root.name
-//      visible: !root.resizing
+      visible: !root.resizing
       paused: false
 
       Label {
