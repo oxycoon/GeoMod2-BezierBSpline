@@ -40,18 +40,18 @@ GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context, const QSize &render_size
     // Setup and init the GMlib GMWindow
     _scene = new GMlib::Scene;
 
-    _proj_renderer = new GMlib::DefaultRendererWithSelect;
-    _proj_renderer->setRenderTarget(new GMlib::RenderTexture("Projection"));
-//    _proj_renderer->setSelectRboName("select_proj");
+//    _proj_renderer = new GMlib::DefaultRendererWithSelect;
+//    _proj_renderer->setRenderTarget(new GMlib::RenderTexture("Projection"));
+////    _proj_renderer->setSelectRboName("select_proj");
 
-    _front_renderer = new GMlib::DefaultRendererWithSelect;
-    _front_renderer->setRenderTarget(new GMlib::RenderTexture("Front"));
+//    _front_renderer = new GMlib::DefaultRendererWithSelect;
+//    _front_renderer->setRenderTarget(new GMlib::RenderTexture("Front"));
 
-    _side_renderer = new GMlib::DefaultRendererWithSelect;
-    _side_renderer->setRenderTarget(new GMlib::RenderTexture("Side"));
+//    _side_renderer = new GMlib::DefaultRendererWithSelect;
+//    _side_renderer->setRenderTarget(new GMlib::RenderTexture("Side"));
 
-    _top_renderer = new GMlib::DefaultRendererWithSelect;
-    _top_renderer->setRenderTarget(new GMlib::RenderTexture("Top"));
+//    _top_renderer = new GMlib::DefaultRendererWithSelect;
+//    _top_renderer->setRenderTarget(new GMlib::RenderTexture("Top"));
 
 
   } _context->doneCurrent();
@@ -75,15 +75,19 @@ void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& new_g
 
   _context->makeCurrent(_offscreensurface); {
 
-    if( name == "Projection" && _proj_cam ) {
-      _proj_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-    }
-    else if( name == "Front" && _front_cam )
-      _front_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-    else if( name == "Side" && _side_cam )
-      _side_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-    else if( name == "Top" && _top_cam )
-      _top_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
+
+    if( _rc_pairs.count(name.toStdString()) > 0 && _rc_pairs[name.toStdString()].camera != nullptr )
+      _rc_pairs[name.toStdString()].render->setViewport(0,0,tex_size.width(),tex_size.height());
+
+//    if( name == "Projection" && _proj_cam ) {
+//      _proj_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
+//    }
+//    else if( name == "Front" && _front_cam )
+//      _front_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
+//    else if( name == "Side" && _side_cam )
+//      _side_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
+//    else if( name == "Top" && _top_cam )
+//      _top_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
 
   } _context->doneCurrent();
 
@@ -102,10 +106,13 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
     _scene->prepare();
     _scene->simulate();
-    _proj_renderer->render();
-    _front_renderer->render();
-    _side_renderer->render();
-    _top_renderer->render();
+    for( auto& rc_pair : _rc_pairs )
+      rc_pair.second.render->render();
+
+//    _proj_renderer->render();
+//    _front_renderer->render();
+//    _side_renderer->render();
+//    _top_renderer->render();
 
   } _context->doneCurrent();
 
@@ -171,46 +178,120 @@ void GMlibWrapper::initScene() {
     // Insert Sun
     _scene->insertSun();
 
+
+
+
+    int init_viewport_size = 600;
     GMlib::Point<float,3> init_cam_pos(  0.0f, 0.0f, 0.0f );
     GMlib::Vector<float,3> init_cam_dir( 0.0f, 1.0f, 0.0f );
     GMlib::Vector<float,3> init_cam_up(  0.0f, 0.0f, 1.0f );
 
-    _proj_cam = new GMlib::Camera( init_cam_pos, init_cam_dir, init_cam_up );
-    _proj_cam->setCuttingPlanes( 1.0f, 8000.0f );
-    _proj_cam->rotateGlobal( GMlib::Angle(-45), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ) );
-    _proj_cam->translate( GMlib::Vector<float,3>( 0.0f, -20.0f, 20.0f ) );
+    _rc_pairs.reserve(4);
+    _rc_pairs["Projection"] = RenderCamPair {};
+    _rc_pairs["Front"]      = RenderCamPair {};
+    _rc_pairs["Side"]       = RenderCamPair {};
+    _rc_pairs["Top"]        = RenderCamPair {};
+
+    for( auto& rcpair : _rc_pairs ) {
+
+      rcpair.second.render = new GMlib::DefaultRendererWithSelect;
+      rcpair.second.camera = new GMlib::Camera;
+      rcpair.second.render->setCamera(rcpair.second.camera);
+    }
+
+    // Projection cam
+    auto& proj_rcpair = _rc_pairs["Projection"];
+    proj_rcpair.render->setRenderTarget(new GMlib::RenderTexture("Projection"));
+    proj_rcpair.camera->set(init_cam_pos,init_cam_dir,init_cam_up);
+    proj_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
+    proj_rcpair.camera->rotateGlobal( GMlib::Angle(-45), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ) );
+    proj_rcpair.camera->translate( GMlib::Vector<float,3>( 0.0f, -20.0f, 20.0f ) );
+    _scene->insertCamera( proj_rcpair.camera );
+    proj_rcpair.render->setViewport( 0, 0, init_viewport_size, init_viewport_size );
+
+    // Front cam
+    auto& front_rcpair = _rc_pairs["Front"];
+    front_rcpair.render->setRenderTarget(new GMlib::RenderTexture("Front"));
+    front_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( 0.0f, -50.0f, 0.0f ), init_cam_dir, init_cam_up );
+    front_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
+    _scene->insertCamera( front_rcpair.camera );
+    front_rcpair.render->setViewport( 0, 0, init_viewport_size, init_viewport_size );
+
+    // Side cam
+    auto& side_rcpair = _rc_pairs["Side"];
+    side_rcpair.render->setRenderTarget(new GMlib::RenderTexture("Side"));
+    side_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( -50.0f, 0.0f, 0.0f ), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ), init_cam_up );
+    side_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
+    _scene->insertCamera( side_rcpair.camera );
+    side_rcpair.render->setViewport( 0, 0, init_viewport_size, init_viewport_size );
+
+    // Top cam
+    auto& top_rcpair = _rc_pairs["Top"];
+    top_rcpair.render->setRenderTarget(new GMlib::RenderTexture("Top"));
+    top_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( 0.0f, 0.0f, 50.0f ), -init_cam_up, init_cam_dir );
+    top_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
+    _scene->insertCamera( top_rcpair.camera );
+    top_rcpair.render->setViewport( 0, 0, init_viewport_size, init_viewport_size );
 
 
-    // Front
-    _front_cam = new GMlib::Camera( init_cam_pos + GMlib::Vector<float,3>( 0.0f, -50.0f, 0.0f ), init_cam_dir, init_cam_up );
-    _front_cam->setCuttingPlanes( 1.0f, 8000.0f );
-    //  _front_cam->zoom( 5.0 );
 
-    // Side
-    _side_cam = new GMlib::Camera( init_cam_pos + GMlib::Vector<float,3>( -50.0f, 0.0f, 0.0f ), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ), init_cam_up );
-    _side_cam->setCuttingPlanes( 1.0f, 8000.0f );
-    //  _side_cam->zoom( 5.0 );
 
-    // Up
-    _top_cam = new GMlib::Camera( init_cam_pos + GMlib::Vector<float,3>( 0.0f, 0.0f, 50.0f ), -init_cam_up, init_cam_dir );
-    _top_cam->setCuttingPlanes( 1.0f, 8000.0f );
-    //  _top_cam->zoom( 10.0 );
 
-    _scene->insertCamera( _proj_cam );
-    _scene->insertCamera( _front_cam );
-    _scene->insertCamera( _side_cam );
-    _scene->insertCamera( _top_cam );
 
-    _proj_renderer->setCamera(_proj_cam);
-    _front_renderer->setCamera(_front_cam);
-    _side_renderer->setCamera(_side_cam);
-    _top_renderer->setCamera(_top_cam);
 
-    int init_size = 600;
-    _proj_renderer->setViewport(0,0,init_size,init_size);
-    _front_renderer->setViewport(0,0,init_size,init_size);
-    _side_renderer->setViewport(0,0,init_size,init_size);
-    _top_renderer->setViewport(0,0,init_size,init_size);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    // Projection
+//    _proj_cam = new GMlib::Camera( init_cam_pos, init_cam_dir, init_cam_up );
+//    _proj_cam->set(init_cam_pos,init_cam_dir,init_cam_up);
+//    _proj_cam->setCuttingPlanes( 1.0f, 8000.0f );
+//    _proj_cam->rotateGlobal( GMlib::Angle(-45), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ) );
+//    _proj_cam->translate( GMlib::Vector<float,3>( 0.0f, -20.0f, 20.0f ) );
+
+
+//    // Front
+//    _front_cam = new GMlib::Camera( init_cam_pos + GMlib::Vector<float,3>( 0.0f, -50.0f, 0.0f ), init_cam_dir, init_cam_up );
+//    _front_cam->setCuttingPlanes( 1.0f, 8000.0f );
+//    //  _front_cam->zoom( 5.0 );
+
+//    // Side
+//    _side_cam = new GMlib::Camera( init_cam_pos + GMlib::Vector<float,3>( -50.0f, 0.0f, 0.0f ), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ), init_cam_up );
+//    _side_cam->setCuttingPlanes( 1.0f, 8000.0f );
+//    //  _side_cam->zoom( 5.0 );
+
+//    // Up
+//    _top_cam = new GMlib::Camera( init_cam_pos + GMlib::Vector<float,3>( 0.0f, 0.0f, 50.0f ), -init_cam_up, init_cam_dir );
+//    _top_cam->setCuttingPlanes( 1.0f, 8000.0f );
+//    //  _top_cam->zoom( 10.0 );
+
+//    _scene->insertCamera( _proj_cam );
+//    _scene->insertCamera( _front_cam );
+//    _scene->insertCamera( _side_cam );
+//    _scene->insertCamera( _top_cam );
+
+//    _proj_renderer->setCamera(_proj_cam);
+//    _front_renderer->setCamera(_front_cam);
+//    _side_renderer->setCamera(_side_cam);
+//    _top_renderer->setCamera(_top_cam);
+
+//    _proj_renderer->setViewport(  0,0,init_viewport_size,init_viewport_size);
+//    _front_renderer->setViewport( 0,0,init_viewport_size,init_viewport_size);
+//    _side_renderer->setViewport(  0,0,init_viewport_size,init_viewport_size);
+//    _top_renderer->setViewport(   0,0,init_viewport_size,init_viewport_size);
 
     _obj_pos = GMlib::Vector<float,2>( 0.0f, 0.0f );
 

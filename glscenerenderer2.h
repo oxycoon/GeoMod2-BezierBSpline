@@ -36,7 +36,6 @@ namespace Private {
       if( !_prog.isValid() ) {
         std::cout << "Prog ! valid: setting up." << std::endl;
 
-
         _vs.create();
         _fs.create();
         _prog.create();
@@ -63,7 +62,6 @@ namespace Private {
               "    gl_FragColor = texture( u_tex0, coords.st );"
               "}"
               );
-
 
         if( !_vs.compile() ) {
           std::cout << "Vertex shader compile error: " << _vs.getCompilerLog() << std::endl;
@@ -96,8 +94,6 @@ namespace Private {
 //      std::cout << "Prog OK!" << std::endl;
 
 
-
-
       glViewport(_viewport.x(), _viewport.y(), _viewport.width(), _viewport.height());
 
       glDisable(GL_DEPTH_TEST);
@@ -109,11 +105,7 @@ namespace Private {
 //      glEnable(GL_BLEND);
 //      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-
-
-
       _prog.bind(); {
-
 
         _prog.setUniform( "u_tex0", _tex, GL_TEXTURE0, GLuint(0) );
 
@@ -124,7 +116,6 @@ namespace Private {
         GL_CHECK(::glDrawArrays(GL_TRIANGLE_STRIP,0,4));
         _vbo.disable(vert_loc);
         _vbo.unbind();
-
 
       } _prog.unbind();
 

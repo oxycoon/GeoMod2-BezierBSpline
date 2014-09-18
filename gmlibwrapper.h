@@ -8,6 +8,7 @@ namespace GMlib {
   template<typename T, int n>
   class PSurf;
 }
+
 #include "core/gmpoint"
 
 // qt
@@ -16,6 +17,20 @@ namespace GMlib {
 class QOpenGLContext;
 class QOffscreenSurface;
 class QOpenGLFramebufferObject;
+
+
+// stl
+#include <memory>
+#include <unordered_map>
+
+
+struct RenderCamPair {
+  RenderCamPair() : render{nullptr}, camera{nullptr} {}
+  GMlib::DefaultRendererWithSelect*   render;
+  GMlib::Camera*                      camera;
+};
+
+
 
 
 class GMlibWrapper : public QObject {
@@ -50,6 +65,10 @@ private:
   GMlib::DefaultRendererWithSelect*   _front_renderer;
   GMlib::DefaultRendererWithSelect*   _side_renderer;
   GMlib::DefaultRendererWithSelect*   _top_renderer;
+
+  std::unordered_map<std::string,RenderCamPair>   _rc_pairs;
+
+
 
 
   GMlib::PSurf<float,3>*    _world;
