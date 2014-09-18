@@ -19,6 +19,29 @@
 // stl
 #include <thread>
 
+
+
+
+
+namespace Private {
+
+  void renderCaller(GMlib::DefaultRendererWithSelect *render, QOpenGLContext *context, QOffscreenSurface* surf) {
+
+    context->makeCurrent(surf);
+    render->render();
+    context->doneCurrent();
+  }
+
+
+}
+
+
+
+
+
+
+
+
 GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context)
   : QObject{}, _timer_id{0}
 {
@@ -102,8 +125,14 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
 
       rc_pair.second.render->render();
+
+
+      //// THIS DOES NOT WORK AND WE KNOW WHY !!!!
 //      threads.push_back(std::thread(&GMlib::Renderer::render,rc_pair.second.render));
 //      threads.push_back(std::thread(&GMlib::DefaultRendererWithSelect::render,rc_pair.second.render));
+
+//      Private::renderCaller(rc_pair.second.render,_context,_offscreensurface);
+//      threads.push_back(std::thread(&Private::renderCaller,rc_pair.second.render,_context,_offscreensurface));
     }
 
     for( auto& thread : threads )
