@@ -15,6 +15,8 @@
 
 GLSceneRenderer2::GLSceneRenderer2() : _renderer{nullptr}, _name{}, _paused{true} {
 
+  setFlag(ItemHasContents);
+  setSmooth(false);
   connect( this, &QQuickItem::windowChanged, this, &GLSceneRenderer2::handleWindowChanged );
 }
 
@@ -28,8 +30,8 @@ void
 GLSceneRenderer2::setTexName(const QString& name) {
 
   _name = name;
-  if(_renderer)
-    _renderer->setTexName(_name.toStdString());
+//  if(_renderer)
+//    _renderer->setTexName(_name.toStdString());
 }
 
 bool
@@ -79,5 +81,6 @@ GLSceneRenderer2::handleWindowChanged(QQuickWindow* window) {
 
   connect( w, &QQuickWindow::beforeSynchronizing, this, &GLSceneRenderer2::sync );
   connect( w, &QQuickWindow::sceneGraphInvalidated, this, &GLSceneRenderer2::cleanup );
+  connect( w, &Window::signFrameReady, this, &GLSceneRenderer2::update );
   connect( this, &GLSceneRenderer2::signViewportChanged, w, &Window::signGuiViewportChanged );
 }

@@ -16,9 +16,11 @@
 #include <QRectF>
 #include <QDebug>
 
-GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context, const QSize &render_size)
-  : QObject(), _timer_id(0), /*_tex_size(initial_render_size),*/
-    _proj_cam(0x0), _front_cam(0x0), _top_cam(0x0), _side_cam(0x0)
+// stl
+#include <thread>
+
+GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context)
+  : QObject{}, _timer_id{0}
 {
 
   // Create Internal shared GL context
@@ -40,20 +42,6 @@ GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context, const QSize &render_size
     // Setup and init the GMlib GMWindow
     _scene = new GMlib::Scene;
 
-//    _proj_renderer = new GMlib::DefaultRendererWithSelect;
-//    _proj_renderer->setRenderTarget(new GMlib::RenderTexture("Projection"));
-////    _proj_renderer->setSelectRboName("select_proj");
-
-//    _front_renderer = new GMlib::DefaultRendererWithSelect;
-//    _front_renderer->setRenderTarget(new GMlib::RenderTexture("Front"));
-
-//    _side_renderer = new GMlib::DefaultRendererWithSelect;
-//    _side_renderer->setRenderTarget(new GMlib::RenderTexture("Side"));
-
-//    _top_renderer = new GMlib::DefaultRendererWithSelect;
-//    _top_renderer->setRenderTarget(new GMlib::RenderTexture("Top"));
-
-
   } _context->doneCurrent();
 
   initScene();
@@ -64,34 +52,22 @@ GMlibWrapper::~GMlibWrapper() {
   stop();
 }
 
-void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& new_geometry) {
+void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& geometry) {
 
-  QSize tex_size = new_geometry.size().toSize();
+  const QSize size = geometry.size().toSize();
 
-  if( tex_size.width() <= 0 || tex_size.height() <= 0 )
+  if( size.width() <= 0 || size.height() <= 0 )
     return;
 
-  stop();
+  if( _rc_pairs.count(name.toStdString()) <= 0 )
+    return;
 
-  _context->makeCurrent(_offscreensurface); {
+  auto& rc_pair = _rc_pairs[name.toStdString()];
+  if(rc_pair.viewport.geometry == geometry )
+    return;
 
-
-    if( _rc_pairs.count(name.toStdString()) > 0 && _rc_pairs[name.toStdString()].camera != nullptr )
-      _rc_pairs[name.toStdString()].render->setViewport(0,0,tex_size.width(),tex_size.height());
-
-//    if( name == "Projection" && _proj_cam ) {
-//      _proj_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-//    }
-//    else if( name == "Front" && _front_cam )
-//      _front_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-//    else if( name == "Side" && _side_cam )
-//      _side_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-//    else if( name == "Top" && _top_cam )
-//      _top_renderer->setViewport(0,0,tex_size.width(),tex_size.height());
-
-  } _context->doneCurrent();
-
-  start();
+  rc_pair.viewport.geometry = geometry;
+  rc_pair.viewport.changed = true;
 }
 
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
@@ -99,22 +75,42 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
   if( !_context->isValid() )
     return;
 
-
   e->accept();
 
   _context->makeCurrent(_offscreensurface); {
 
     _scene->prepare();
-    _scene->simulate();
-    for( auto& rc_pair : _rc_pairs )
-      rc_pair.second.render->render();
 
-//    _proj_renderer->render();
-//    _front_renderer->render();
-//    _side_renderer->render();
-//    _top_renderer->render();
+
+    std::vector<std::thread> threads;
+
+//    _scene->simulate();
+    threads.push_back(std::thread(&GMlib::Scene::simulate,_scene));
+
+
+    for( auto& rc_pair : _rc_pairs ) {
+      qDebug() << "About to render: " << rc_pair.first.c_str();
+      qDebug() << "  Viewport: ";
+      qDebug() << "    Changed: " << rc_pair.second.viewport.changed;
+      qDebug() << "    Geometry: " << rc_pair.second.viewport.geometry;
+
+      if(rc_pair.second.viewport.changed) {
+        const QSizeF size = rc_pair.second.viewport.geometry.size();
+        rc_pair.second.render->setViewport(0,0,size.width(),size.height());
+        rc_pair.second.viewport.changed = false;
+      }
+
+
+      rc_pair.second.render->render();
+//      threads.push_back(std::thread(&GMlib::Renderer::render,rc_pair.second.render));
+//      threads.push_back(std::thread(&GMlib::DefaultRendererWithSelect::render,rc_pair.second.render));
+    }
+
+    for( auto& thread : threads )
+      thread.join();
 
   } _context->doneCurrent();
+
 
 
   emit signFrameReady();
@@ -321,44 +317,44 @@ GMlib::Scene*GMlibWrapper::getScene() const {
 
 
 
-void GMlibWrapper::select(int x, int y) {
+//void GMlibWrapper::select(int x, int y) {
 
-  qDebug() << "Mouse clicked at " << x << " " << y;
-
-
-  _context->makeCurrent(_offscreensurface ); {
-
-    y = _proj_renderer->getViewportH() - y - 1;
-
-    qDebug() << "Select: " << x << " " << y;
-
-    _proj_renderer->select(-GMlib::GM_SO_TYPE_SELECTOR);
-
-    GMlib::DisplayObject* so = _proj_renderer->findObject(x,y);
-    if( so ) {
-      qDebug() << "DO found: " << so->getIdentity().c_str();
-      so->toggleSelected();
-    }
-    else {
-      qDebug() << "No DO found";
-    }
+//  qDebug() << "Mouse clicked at " << x << " " << y;
 
 
+//  _context->makeCurrent(_offscreensurface ); {
 
+//    y = _proj_renderer->getViewportH() - y - 1;
 
-//    GMlib::Camera *ac = _gmwindow->findCamera( GMlib::Vector<int,2>(x,y) );
-//    if(!ac) {
-//      qDebug() << "Active camera not found in GMWindow!!";
-//      return;
-//    }
-//    GMlib::SceneObject *so = ac->findSelectObject( x, y, -GMlib::GM_SO_TYPE_SELECTOR );
-//  //  GMlib::SceneObject *so = _gmwindow->findSelectObject( ac, x, y, -GMlib::GM_SO_TYPE_SELECTOR );
+//    qDebug() << "Select: " << x << " " << y;
+
+//    _proj_renderer->select(-GMlib::GM_SO_TYPE_SELECTOR);
+
+//    GMlib::DisplayObject* so = _proj_renderer->findObject(x,y);
 //    if( so ) {
-//      qDebug() << "SO found: " << so->getIdentity().c_str();
+//      qDebug() << "DO found: " << so->getIdentity().c_str();
 //      so->toggleSelected();
 //    }
 //    else {
-//      qDebug() << "No SO found";
+//      qDebug() << "No DO found";
 //    }
-  }
-}
+
+
+
+
+////    GMlib::Camera *ac = _gmwindow->findCamera( GMlib::Vector<int,2>(x,y) );
+////    if(!ac) {
+////      qDebug() << "Active camera not found in GMWindow!!";
+////      return;
+////    }
+////    GMlib::SceneObject *so = ac->findSelectObject( x, y, -GMlib::GM_SO_TYPE_SELECTOR );
+////  //  GMlib::SceneObject *so = _gmwindow->findSelectObject( ac, x, y, -GMlib::GM_SO_TYPE_SELECTOR );
+////    if( so ) {
+////      qDebug() << "SO found: " << so->getIdentity().c_str();
+////      so->toggleSelected();
+////    }
+////    else {
+////      qDebug() << "No SO found";
+////    }
+//  }
+//}

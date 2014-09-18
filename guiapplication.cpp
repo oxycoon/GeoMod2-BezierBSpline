@@ -40,31 +40,33 @@ void GuiApplication::onSGInit() {
   qDebug() << "Initialized GLformat: " << ctx->format();
 
   // Init GMlibWrapper
-  _gmlib = new GMlibWrapper( ctx, _window->size() );
+  _gmlib = new GMlibWrapper(ctx);
   connect( _gmlib,  &GMlibWrapper::signFrameReady,
            _window, &Window::signFrameReady );
   connect( _window, &Window::signGuiViewportChanged,
            _gmlib,  &GMlibWrapper::changeRenderGeometry );
 
-  _gmlib->start();
 
   // Load gui qml
   _window->setSource( QUrl("qrc:/qml/main.qml") );
 
-  // Set up hidmanager
-//  _hidmanager = new StandardHidManager(_gmlib->getScene(),this);
 
-  connect( _window->rootObject(), SIGNAL(mousePressed(QString,int,int,bool,int,int)),
-           this, SLOT(handleMousePressEvent(QString,int,int,bool,int,int)) );
-  connect( _window->rootObject(), SIGNAL(mouseReleased(QString,int,int,bool,int,int)),
-           this, SLOT(handleMouseReleaseEvent(QString,int,int,bool,int,int)) );
-  connect( _window->rootObject(), SIGNAL(mousePositionChanged(QString,int,int,bool,int,int)),
-           this, SLOT(handleMousePositionChangedEvent(QString,int,int,bool,int,int)) );
+  _gmlib->start();
 
-  connect( _window->rootObject(), SIGNAL(keyPressed(QString,int,int)),
-           this, SLOT(handleKeyPressEvent(QString,int,int)) );
-  connect( _window->rootObject(), SIGNAL(keyReleased(QString,int,int)),
-           this, SLOT(handleKeyReleaseEvent(QString,int,int)) );
+//  // Set up hidmanager
+////  _hidmanager = new StandardHidManager(_gmlib->getScene(),this);
+
+//  connect( _window->rootObject(), SIGNAL(mousePressed(QString,int,int,bool,int,int)),
+//           this, SLOT(handleMousePressEvent(QString,int,int,bool,int,int)) );
+//  connect( _window->rootObject(), SIGNAL(mouseReleased(QString,int,int,bool,int,int)),
+//           this, SLOT(handleMouseReleaseEvent(QString,int,int,bool,int,int)) );
+//  connect( _window->rootObject(), SIGNAL(mousePositionChanged(QString,int,int,bool,int,int)),
+//           this, SLOT(handleMousePositionChangedEvent(QString,int,int,bool,int,int)) );
+
+//  connect( _window->rootObject(), SIGNAL(keyPressed(QString,int,int)),
+//           this, SLOT(handleKeyPressEvent(QString,int,int)) );
+//  connect( _window->rootObject(), SIGNAL(keyReleased(QString,int,int)),
+//           this, SLOT(handleKeyReleaseEvent(QString,int,int)) );
 }
 
 GuiApplication::~GuiApplication() {
@@ -89,11 +91,11 @@ void GuiApplication::handleMousePressEvent(const QString& view_name, int buttons
 //  qDebug() << "  x: " << x;
 //  qDebug() << "  y: " << y;
 
-  if( view_name == "Projection" ) {
-    qDebug() << "Selecting projection";
+//  if( view_name == "Projection" ) {
+//    qDebug() << "Selecting projection";
 
-    _gmlib->select(x,y);
-  }
+//    _gmlib->select(x,y);
+//  }
 }
 
 void GuiApplication::handleMouseReleaseEvent(const QString& view_name, int buttons, int modifiers, bool was_held, int x, int y) {
