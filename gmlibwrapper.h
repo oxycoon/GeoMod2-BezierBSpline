@@ -4,6 +4,7 @@ namespace GMlib {
   class Scene;
   class Camera;
   class DefaultRendererWithSelect;
+  class RenderTexture;
 
   template<typename T, int n>
   class PSurf;
@@ -41,6 +42,8 @@ struct RenderCamPair {
 
 class GMlibWrapper : public QObject {
   Q_OBJECT
+private:
+  explicit GMlibWrapper();
 public:
   explicit GMlibWrapper( QOpenGLContext *top_ctx);
   ~GMlibWrapper();
@@ -52,6 +55,10 @@ public:
 
 
   GMlib::Scene*             getScene() const;
+
+
+  GMlib::RenderTexture*     getRenderTextureOf( const std::string& name );
+
 
 public slots:
   void                      changeRenderGeometry( const QString& name, const QRectF &new_geometry );
@@ -79,4 +86,10 @@ private:
 
 signals:
   void                      signFrameReady();
+
+
+private:
+  static GMlibWrapper*      _instance;
+public:
+  static GMlibWrapper*      getInstance();
 };

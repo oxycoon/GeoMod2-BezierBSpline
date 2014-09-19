@@ -3,12 +3,16 @@
 
 #include <QQuickItem>
 
+
+#include "gmlibwrapper.h"
+
 // gmlib
 #include <opengl/gmtexture>
 #include <opengl/gmprogram>
 #include <opengl/shaders/gmvertexshader.h>
 #include <opengl/shaders/gmfragmentshader.h>
 #include <opengl/bufferobjects/gmvertexbufferobject.h>
+#include <scene/render/rendertargets/gmrendertexture.h>
 
 // qt
 #include <QOpenGLShaderProgram>
@@ -31,7 +35,11 @@ namespace Private {
 
   public slots:
     void      paint() {
-//      qDebug() << "Painting on viewport: " << _viewport << ", tex id: " << _tex.getId();
+//      qDebug() << "Painting on viewport " << _tex.getName().c_str() << ": " << _viewport << ", tex id: " << _tex.getId();
+
+      GMlib::RenderTexture *render_tex = GMlibWrapper::getInstance()->getRenderTextureOf(_tex.getName());
+      const GMlib::GL::Texture& tex = render_tex->getTexture();
+      qDebug() << "Painting render target: " << render_tex;
 
       if( !_prog.isValid() ) {
         std::cout << "Prog ! valid: setting up." << std::endl;
@@ -96,18 +104,19 @@ namespace Private {
 
       glViewport(_viewport.x(), _viewport.y(), _viewport.width(), _viewport.height());
 
-      glDisable(GL_DEPTH_TEST);
+//      glDisable(GL_DEPTH_TEST);
 
 //      glClearColor(0, 0, 0, 1);
 //      glClear(GL_COLOR_BUFFER_BIT);
 
-      glDisable(GL_BLEND);
+//      glDisable(GL_BLEND);
 //      glEnable(GL_BLEND);
 //      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
       _prog.bind(); {
 
-        _prog.setUniform( "u_tex0", _tex, GL_TEXTURE0, GLuint(0) );
+//        _prog.setUniform( "u_tex0", _tex, GL_TEXTURE0, GLuint(0) );
+        _prog.setUniform( "u_tex0", tex, GL_TEXTURE0, GLuint(0) );
 
         GMlib::GL::AttributeLocation vert_loc = _prog.getAttributeLocation("vertices");
 
@@ -158,15 +167,9 @@ public slots:
   void      sync();
   void      cleanup();
 
-
-protected:
-  void      geometryChanged(const QRectF &newGeometry, const QRectF&) {
-
-//    qDebug() << "Geometry changed of: " << _tex_name << ", geo: " << mapRectToScene(newGeometry);
-  }
-
 private slots:
   void      handleWindowChanged( QQuickWindow * window );
+  void      bah() { qDebug() << "BAHHHHHHHHHHHHHHHHHHHHHHHH!!!!"; }
 
 private:
   std::unique_ptr<Private::Renderer>      _renderer;

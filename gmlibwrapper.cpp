@@ -40,10 +40,23 @@ namespace Private {
 
 
 
+GMlibWrapper* GMlibWrapper::_instance = nullptr;
 
+
+
+GMlibWrapper::GMlibWrapper() : QObject(), _timer_id{0} {
+  if(_instance != nullptr) {
+
+    std::cerr << "This version of the GMlibWrapper only supports a single instance of the GMlibWraper..." << std::endl;
+    std::cerr << "Only one of me(0x" << this << ") please!! ^^" << std::endl;
+    exit(666);
+  }
+
+  _instance = this;
+}
 
 GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context)
-  : QObject{}, _timer_id{0}
+  : GMlibWrapper()
 {
 
   // Create Internal shared GL context
@@ -112,10 +125,10 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
 
     for( auto& rc_pair : _rc_pairs ) {
-      qDebug() << "About to render: " << rc_pair.first.c_str();
-      qDebug() << "  Viewport: ";
-      qDebug() << "    Changed: " << rc_pair.second.viewport.changed;
-      qDebug() << "    Geometry: " << rc_pair.second.viewport.geometry;
+//      qDebug() << "About to render: " << rc_pair.first.c_str();
+//      qDebug() << "  Viewport: ";
+//      qDebug() << "    Changed: " << rc_pair.second.viewport.changed;
+//      qDebug() << "    Geometry: " << rc_pair.second.viewport.geometry;
 
       if(rc_pair.second.viewport.changed) {
         const QSizeF size = rc_pair.second.viewport.geometry.size();
@@ -127,7 +140,7 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
       rc_pair.second.render->render();
 
 
-      //// THIS DOES NOT WORK AND WE KNOW WHY !!!!
+      //// THIS DOES NOT WORK AND WE KNOW WHY: need to move context around !!!!
 //      threads.push_back(std::thread(&GMlib::Renderer::render,rc_pair.second.render));
 //      threads.push_back(std::thread(&GMlib::DefaultRendererWithSelect::render,rc_pair.second.render));
 
@@ -167,6 +180,11 @@ void GMlibWrapper::moveObj(const GMlib::Vector<float,2>& dir) {
     _obj->translateGlobal(n_corr + (w_eval(0)(0) - _obj->getPos()) );
 
   } _context->doneCurrent();
+}
+
+GMlibWrapper*
+GMlibWrapper::getInstance() {
+  return _instance;
 }
 
 void GMlibWrapper::start() {
@@ -342,6 +360,14 @@ void GMlibWrapper::initScene() {
 GMlib::Scene*GMlibWrapper::getScene() const {
 
   return _scene;
+}
+
+GMlib::RenderTexture*
+GMlibWrapper::getRenderTextureOf(const std::string& name) {
+
+  if( _rc_pairs.count(name) > 0 ) return static_cast<GMlib::RenderTexture*>(_rc_pairs[name].render->getRenderTarget());
+
+  return nullptr;
 }
 
 
