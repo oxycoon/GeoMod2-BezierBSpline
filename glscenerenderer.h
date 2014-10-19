@@ -53,8 +53,6 @@ namespace Private {
     GMlib::GL::VertexShader         _vs;
     GMlib::GL::FragmentShader       _fs;
 
-//    std::unique_ptr<QOpenGLShaderProgram>   _prog;
-
   }; // END namespace Renderer
 
 }
@@ -66,21 +64,11 @@ class GLSceneRenderer : public QQuickItem {
   Q_PROPERTY(bool    paused   READ isPaused   WRITE setPaused)
 
 
-  Q_PROPERTY(QString view_type     READ getViewType WRITE setViewType)
-
-
-
-
 public:
   explicit GLSceneRenderer();
 
   const QString&        getTexName() const;
   void                  setTexName( const QString& tex_name );
-
-
-  const QString&        getViewType() const { return _view_type; }
-  void                  setViewType( const QString& view_type ) { _view_type = view_type; }
-  QString               _view_type;
 
   bool                  isPaused() const;
   void                  setPaused( bool paused );

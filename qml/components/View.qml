@@ -8,18 +8,9 @@ Item {
   id: root
 
   property string name : ""
-  property string view_type : ""
   property bool   resizing : false
 
   signal forceRender
-
-  signal mousePressed( string view_name, int buttons, int modifiers, bool wasHeld, int x, int y )
-  signal mouseReleased( string view_name, int buttons, int modifiers, bool wasHeld, int x, int y )
-  signal mouseDoubleClicked( string view_name, int buttons, int modifiers, bool wasHeld, int x, int y )
-  signal mousePositionChanged(string view_name, int buttons, int modifiers, bool wasHeld, int x, int y )
-
-  signal keyPressed( string view_name, int key, int modifiers )
-  signal keyReleased( string view_name, int key, int modifiers )
 
   Rectangle {
     id: bah
@@ -39,7 +30,7 @@ Item {
       name: root.name
 //      visible: !root.resizing
       paused: false
-      view_type: root.view_type
+//      view_type: root.view_type
 
       Label {
         anchors.top: parent.top
@@ -53,25 +44,6 @@ Item {
         }
       }
     }
-
-    Keys.onPressed:  root.keyPressed(root.name,event.key,event.modifiers)
-    Keys.onReleased: root.keyReleased(root.name,event.key,event.modifiers)
-
-
-    MouseArea {
-      anchors.fill: parent
-      acceptedButtons: Qt.AllButtons
-      onClicked: scope.focus = true
-      onPressed:  root.mousePressed(root.name,mouse.buttons,mouse.modifiers,mouse.wasHeld,mouse.x,mouse.y)
-      onReleased: root.mouseReleased(root.name,mouse.buttons,mouse.modifiers,mouse.wasHeld,mouse.x,mouse.y)
-      onDoubleClicked: root.mouseDoubleClicked(root.name,mouse.buttons,mouse.modifiers,mouse.wasHeld,mouse.x,mouse.y)
-      onPositionChanged: root.mousePositionChanged(root.name,mouse.buttons,mouse.modifiers,mouse.wasHeld,mouse.x,mouse.y)
-
-//      onEntered: scope.focus = true
-//      onExited: scope.focus = false
-//      hoverEnabled: true
-    }
-
   }
 
   onResizingChanged: {
