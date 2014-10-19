@@ -1,7 +1,6 @@
 // local
 #include "guiapplication.h"
 #include "glscenerenderer.h"
-#include "glscenerenderer2.h"
 
 // gmlib
 #include <core/gmglobal>
@@ -9,7 +8,7 @@
 // qt
 #include <QDebug>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) try {
 
   // Checking Qt Development Framework Version
   if( QT_VERSION < QT_VERSION_CHECK( 5, 1, 0 ) ) {
@@ -40,11 +39,16 @@ int main(int argc, char *argv[]) {
 
   // Register modules
   qmlRegisterType<GLSceneRenderer>( "MyCustomQuick", 1, 0, "GLSceneRenderer" );
-  qmlRegisterType<GLSceneRenderer2>( "MyCustomQuick", 1, 0, "GLSceneRendererNoQSGTexture" );
 
   // Create the application object
   GuiApplication a(argc, argv);
 
   // Start the app, and return control to the Qt system.
   return a.exec();
+}
+catch(const std::exception& e) {
+  std::cerr << "some exception: " << e.what() << std::endl;
+}
+catch(...) {
+  std::cerr << "unknown exception!!" << std::endl;
 }

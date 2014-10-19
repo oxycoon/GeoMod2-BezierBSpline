@@ -3,8 +3,8 @@ namespace GMlib {
 
   class Scene;
   class Camera;
-  class DefaultRendererWithSelect;
-  class RenderTexture;
+  class DefaultRenderer;
+  class TextureRenderTarget;
 
   template<typename T, int n>
   class PSurf;
@@ -28,11 +28,11 @@ class QOpenGLFramebufferObject;
 
 struct RenderCamPair {
   RenderCamPair() : render{nullptr}, camera{nullptr} {}
-  GMlib::DefaultRendererWithSelect*   render;
-  GMlib::Camera*                      camera;
+  GMlib::DefaultRenderer*       render;
+  GMlib::Camera*                camera;
   struct {
-    QRectF                            geometry { QRectF(0,0,200,200) };
-    bool                              changed {true};
+    QRectF                      geometry { QRectF(0,0,200,200) };
+    bool                        changed {true};
   } viewport;
 };
 
@@ -42,54 +42,51 @@ struct RenderCamPair {
 
 class GMlibWrapper : public QObject {
   Q_OBJECT
-private:
-  explicit GMlibWrapper();
+//private:
+//  explicit GMlibWrapper();
 public:
   explicit GMlibWrapper( QOpenGLContext *top_ctx);
   ~GMlibWrapper();
 
-  void                      start();
-  void                      stop();
+  void                                  start();
+  void                                  stop();
 
-  void                      initScene();
-
-
-  GMlib::Scene*             getScene() const;
+  const std::shared_ptr<GMlib::Scene>&  getScene() const;
+  const GMlib::TextureRenderTarget&     getRenderTextureOf( const std::string& name ) const;
 
 
-  GMlib::RenderTexture*     getRenderTextureOf( const std::string& name );
-
+  void                                  initTestScene();
 
 public slots:
-  void                      changeRenderGeometry( const QString& name, const QRectF &new_geometry );
-
-//  void                      select( int x, int y );
+  void                                  changeRenderGeometry( const QString& name,
+                                                              const QRectF &new_geometry );
 
 protected:
-  void                      timerEvent(QTimerEvent *e);
+  void                                  timerEvent(QTimerEvent *e);
+
+
 
 private:
-  int                       _timer_id;
-  QOpenGLContext*           _context;
-  QOffscreenSurface*        _offscreensurface;
-  GMlib::Scene*             _scene;
+  int                                               _timer_id;
+  std::shared_ptr<QOpenGLContext>                   _context;
+  std::shared_ptr<QOffscreenSurface>                _offscreensurface;
+  std::shared_ptr<GMlib::Scene>                     _scene;
+  std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
 
-  std::unordered_map<std::string,RenderCamPair>   _rc_pairs;
+  std::shared_ptr<GMlib::PSurf<float,3>>            _world;
+  std::shared_ptr<GMlib::PSurf<float,3>>            _obj;
+  GMlib::Point<float,2>                             _obj_pos;
 
-  GMlib::PSurf<float,3>*    _world;
-  GMlib::PSurf<float,3>*    _obj;
-
-  GMlib::Point<float,2>     _obj_pos;
-
-
-  void                      moveObj( const GMlib::Vector<float,2>& dir );
+  void                                              moveObj( const GMlib::Vector<float,2>& dir );
 
 signals:
-  void                      signFrameReady();
+  void                                              signFrameReady();
 
 
+
+  // "Singleton instance"
 private:
-  static GMlibWrapper*      _instance;
+  static std::unique_ptr<GMlibWrapper>      _instance;
 public:
-  static GMlibWrapper*      getInstance();
+  static const GMlibWrapper&                getInstance();
 };

@@ -1,39 +1,113 @@
-#include <opengl/gmtexture>
+#ifndef __GLSCENERENDERER_H__
+#define __GLSCENERENDERER_H__
 
-#include <QtQuick/QQuickItem>
-#include <QtCore/QPropertyAnimation>
+#include <QQuickItem>
+
+
+#include "gmlibwrapper.h"
+
+// gmlib
+#include <opengl/gmtexture>
+#include <opengl/gmprogram>
+#include <opengl/shaders/gmvertexshader.h>
+#include <opengl/shaders/gmfragmentshader.h>
+#include <opengl/bufferobjects/gmvertexbufferobject.h>
+#include <scene/render/rendertargets/gmtexturerendertarget.h>
+
+// qt
+#include <QOpenGLShaderProgram>
+#include <QDebug>
+
+
+// stl
+#include <memory>
+#include <mutex>
+
+
+namespace Private {
+
+
+
+
+  // Invariants
+  // Name must be valid!
+  class Renderer: public QObject {
+    Q_OBJECT
+  public:
+    Renderer( const std::string& name );
+
+    void      setName( const std::string& name );
+
+  public slots:
+    void      paint();
+    void      setViewport( const QRectF& rect );
+    void      setViewport( int x, int y, int w, int h );
+
+  private:
+    QRectF                          _viewport;
+
+    GMlib::GL::VertexBufferObject   _vbo;
+    std::string                     _name;
+
+    GMlib::GL::Program              _prog;
+    GMlib::GL::VertexShader         _vs;
+    GMlib::GL::FragmentShader       _fs;
+
+//    std::unique_ptr<QOpenGLShaderProgram>   _prog;
+
+  }; // END namespace Renderer
+
+}
+
 
 class GLSceneRenderer : public QQuickItem {
   Q_OBJECT
   Q_PROPERTY(QString name     READ getTexName WRITE setTexName)
   Q_PROPERTY(bool    paused   READ isPaused   WRITE setPaused)
+
+
+  Q_PROPERTY(QString view_type     READ getViewType WRITE setViewType)
+
+
+
+
 public:
-  GLSceneRenderer( QQuickItem *parent = 0 );
+  explicit GLSceneRenderer();
 
   const QString&        getTexName() const;
   void                  setTexName( const QString& tex_name );
 
+
+  const QString&        getViewType() const { return _view_type; }
+  void                  setViewType( const QString& view_type ) { _view_type = view_type; }
+  QString               _view_type;
+
   bool                  isPaused() const;
   void                  setPaused( bool paused );
 
-  Q_INVOKABLE   void    forceRender();
+public slots:
+  void                  paint();
+  void                  sync();
+  void                  cleanup();
 
-
-
-signals:
-  void                  signRenderGeometryChanged(const QString& name, const QRectF &geometry);
-
-protected:
-  // virtual from QQuickItem
-  QSGNode*              updatePaintNode(QSGNode *node, UpdatePaintNodeData *data);
-  void                  itemChange(ItemChange, const ItemChangeData &);
-  void                  geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+private slots:
+  void                  handleWindowChanged( QQuickWindow * window );
 
 private:
-  QSize                 _tex_size;
-  GMlib::GL::Texture    _tex;
-  QString               _tex_name;
+  std::unique_ptr<Private::Renderer>      _renderer;
+  QString                                 _name;
+  bool                                    _paused;
 
-  bool                  _paused;
+signals:
+  void                  signViewportChanged( const QString& name, const QRectF& size );
+
+protected slots:
+  void                  itemChange(ItemChange change, const ItemChangeData& value ) override;
+  QSGNode*              updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
+
 
 };
+
+
+
+#endif // __GLSCENERENDERER2_H__

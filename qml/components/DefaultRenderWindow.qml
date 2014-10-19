@@ -17,7 +17,8 @@ Item {
 
   View {
     id: singleview; anchors.fill: parent;
-    visible: false; name: ""; onMouseDoubleClicked: root.state = ""
+    view_type: "single view"
+    visible: true; name: "Projection"; onMouseDoubleClicked: root.state = ""
     Component.onCompleted: {
       keyPressed.connect(root.keyPressed)
       keyReleased.connect(root.keyReleased)
@@ -28,73 +29,77 @@ Item {
     }
   }
 
-  RelativeSplitView {
-    id: multiview
-    anchors.fill: parent
-    orientation: Qt.Vertical
+//  RelativeSplitView {
+//    id: multiview
+//    anchors.fill: parent
+//    orientation: Qt.Vertical
 
-    RelativeSplitView {
-      id: sp1
-      orientation: Qt.Horizontal
-      View {
-        id: top_view
-        visible: true; name: "Top";       onMouseDoubleClicked: root.state = "top_view";
-        Component.onCompleted: {
-          resizing = Qt.binding(d.viewsChanging)
-          keyPressed.connect(root.keyPressed)
-          keyReleased.connect(root.keyReleased)
-          mousePressed.connect(root.mousePressed)
-          mouseReleased.connect(root.mouseReleased)
-          mouseDoubleClicked.connect(root.mouseDoubleClicked)
-          mousePositionChanged.connect(root.mousePositionChanged)
-        }
-      }
-      View {
-        id: side_view
-        visible: true; name: "Side";      onMouseDoubleClicked: root.state = "side_view";
-        Component.onCompleted: {
-          resizing = Qt.binding(d.viewsChanging)
-          keyPressed.connect(root.keyPressed)
-          keyReleased.connect(root.keyReleased)
-          mousePressed.connect(root.mousePressed)
-          mouseReleased.connect(root.mouseReleased)
-          mouseDoubleClicked.connect(root.mouseDoubleClicked)
-          mousePositionChanged.connect(root.mousePositionChanged)
-        }
-      }
-    }
+//    RelativeSplitView {
+//      id: sp1
+//      orientation: Qt.Horizontal
+//      View {
+//        id: top_view
+//        view_type: "multi view"
+//        visible: true; name: "Top";       onMouseDoubleClicked: root.state = "top_view";
+//        Component.onCompleted: {
+//          resizing = Qt.binding(d.viewsChanging)
+//          keyPressed.connect(root.keyPressed)
+//          keyReleased.connect(root.keyReleased)
+//          mousePressed.connect(root.mousePressed)
+//          mouseReleased.connect(root.mouseReleased)
+//          mouseDoubleClicked.connect(root.mouseDoubleClicked)
+//          mousePositionChanged.connect(root.mousePositionChanged)
+//        }
+//      }
+//      View {
+//        id: side_view
+//        view_type: "multi view"
+//        visible: true; name: "Side";      onMouseDoubleClicked: root.state = "side_view";
+//        Component.onCompleted: {
+//          resizing = Qt.binding(d.viewsChanging)
+//          keyPressed.connect(root.keyPressed)
+//          keyReleased.connect(root.keyReleased)
+//          mousePressed.connect(root.mousePressed)
+//          mouseReleased.connect(root.mouseReleased)
+//          mouseDoubleClicked.connect(root.mouseDoubleClicked)
+//          mousePositionChanged.connect(root.mousePositionChanged)
+//        }
+//      }
+//    }
 
-    RelativeSplitView {
-      id: sp2
-      orientation: Qt.Horizontal
-      View {
-        id: projection_view
-        visible: true; name: "Projection"; onMouseDoubleClicked: root.state = "projection_view";
-        Component.onCompleted: {
-          resizing = Qt.binding(d.viewsChanging)
-          keyPressed.connect(root.keyPressed)
-          keyReleased.connect(root.keyReleased)
-          mousePressed.connect(root.mousePressed)
-          mouseReleased.connect(root.mouseReleased)
-          mouseDoubleClicked.connect(root.mouseDoubleClicked)
-          mousePositionChanged.connect(root.mousePositionChanged)
-        }
-      }
-      View {
-        id: front_view
-        visible: true; name: "Front";      onMouseDoubleClicked: root.state = "front_view";
-        Component.onCompleted: {
-          resizing = Qt.binding(d.viewsChanging)
-          keyPressed.connect(root.keyPressed)
-          keyReleased.connect(root.keyReleased)
-          mousePressed.connect(root.mousePressed)
-          mouseReleased.connect(root.mouseReleased)
-          mouseDoubleClicked.connect(root.mouseDoubleClicked)
-          mousePositionChanged.connect(root.mousePositionChanged)
-        }
-      }
-    }
-  }
+//    RelativeSplitView {
+//      id: sp2
+//      orientation: Qt.Horizontal
+//      View {
+//        id: projection_view
+//        view_type: "multi view"
+//        visible: true; name: "Projection"; onMouseDoubleClicked: root.state = "projection_view";
+//        Component.onCompleted: {
+//          resizing = Qt.binding(d.viewsChanging)
+//          keyPressed.connect(root.keyPressed)
+//          keyReleased.connect(root.keyReleased)
+//          mousePressed.connect(root.mousePressed)
+//          mouseReleased.connect(root.mouseReleased)
+//          mouseDoubleClicked.connect(root.mouseDoubleClicked)
+//          mousePositionChanged.connect(root.mousePositionChanged)
+//        }
+//      }
+//      View {
+//        id: front_view
+//        view_type: "multi view"
+//        visible: true; name: "Front";      onMouseDoubleClicked: root.state = "front_view";
+//        Component.onCompleted: {
+//          resizing = Qt.binding(d.viewsChanging)
+//          keyPressed.connect(root.keyPressed)
+//          keyReleased.connect(root.keyReleased)
+//          mousePressed.connect(root.mousePressed)
+//          mouseReleased.connect(root.mouseReleased)
+//          mouseDoubleClicked.connect(root.mouseDoubleClicked)
+//          mousePositionChanged.connect(root.mousePositionChanged)
+//        }
+//      }
+//    }
+//  }
 
   QtObject {
     id: d

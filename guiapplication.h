@@ -7,6 +7,9 @@
 // qt
 #include <QGuiApplication>
 
+// stl
+#include <memory>
+
 
 class Window;
 class GMlibWrapper;
@@ -16,32 +19,18 @@ class GuiApplication : public QGuiApplication {
   Q_OBJECT
 public:
   explicit GuiApplication(int& argc, char* argv[]);
-  ~GuiApplication();
-
-
-//  StandardHidManager*         getHidManager() const;
 
 private:
-  Window*                     _window;
-  GMlibWrapper*               _gmlib;
-//  StandardHidManager*         _hidmanager;
+  std::shared_ptr<Window>         _window;
+  std::shared_ptr<GMlibWrapper>   _gmlib;
 
 private slots:
   void                        onSGInit();
 
-
-
-  void                        handleMousePressEvent( const QString& view_name, int buttons, int modifiers, bool was_held, int x, int y );
-  void                        handleMouseReleaseEvent( const QString& view_name, int buttons, int modifiers, bool was_held, int x, int y );
-  void                        handleMousePositionChangedEvent( const QString& view_name, int buttons, int modifiers, bool was_held, int x, int y );
-
-  void                        handleKeyPressEvent( const QString& view_name, int key, int modifiers );
-  void                        handleKeyReleaseEvent( const QString& view_name, int key, int modifiers );
-
 private:
-  static GuiApplication*      _instance;
+  static std::unique_ptr<GuiApplication>    _instance;
 public:
-  static GuiApplication*      getInstance();
+  static const GuiApplication&            getInstance();
 };
 
 #endif // GUIAPPLICATION_H

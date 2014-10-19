@@ -8,6 +8,7 @@ Item {
   id: root
 
   property string name : ""
+  property string view_type : ""
   property bool   resizing : false
 
   signal forceRender
@@ -32,12 +33,13 @@ Item {
     anchors.fill: parent
 
     //    GLSceneRenderer {
-    GLSceneRendererNoQSGTexture {
+    GLSceneRenderer{
       id: renderer
       anchors.fill: parent
       name: root.name
-      visible: !root.resizing
+//      visible: !root.resizing
       paused: false
+      view_type: root.view_type
 
       Label {
         anchors.top: parent.top

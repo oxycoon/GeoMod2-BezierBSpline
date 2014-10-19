@@ -1,98 +1,175 @@
 #include "glscenerenderer.h"
-
-// local
 #include "window.h"
-#include "guiapplication.h"
-
-// hidmanager
-//#include <standardhidmanager.h>
 
 // Qt
-#include <QSGSimpleTextureNode>
+#include <QQuickWindow>
+#include <QDebug>
+
+// stl
+#include <iostream>
 
 
 
 
-class Texture : public QSGDynamicTexture {
-public:
-  Texture( const std::string& name ) { _tex.acquire(name); }
+namespace Private {
 
-  void        acquireTexId( const std::string& name ) { _tex.acquire(name); }
-  void        setSize( const QSize& size ) { _size = size; }
+  Renderer::Renderer (const std::string& name) : _name{name} {}
 
-  // virtual fron QSGTexture
+  void
+  Renderer::paint() {
+
+      qDebug() << "Painting on viewport " << _name.c_str() << ": " << _viewport;
+
+    assert(_name.length());
+
+    qDebug() << "Renderer::paint; " << _name.c_str();
+
+    const GMlib::TextureRenderTarget &render_tex = GMlibWrapper::getInstance().getRenderTextureOf(_name);
+    const GMlib::GL::Texture& tex = render_tex.getTexture();
+
+    if( !_prog.isValid() ) {
+      std::cout << "Prog ! valid: setting up." << std::endl;
+
+      _vs.create();
+      _fs.create();
+      _prog.create();
+
+      _vs.setSource(
+            "#version 150 compatibility\n"
+            "layout(std140) uniform;\n"
+            "in  vec4 vertices;"
+            "out vec2 coords;"
+            "out vec4 gl_Position;"
+            "void main() {"
+            "    gl_Position = vertices;"
+            "    coords = (vertices.xy + vec2(1.0,1.0))*0.5;"
+            "}"
+            );
+
+      _fs.setSource(
+            "#version 150 compatibility\n"
+            "layout(std140) uniform;\n"
+            "\n"
+            "uniform sampler2D u_tex0;"
+            "in vec2 coords;"
+            "void main() {"
+            "    gl_FragColor = texture( u_tex0, coords.st );"
+            "}"
+            );
+
+      if( !_vs.compile() ) {
+        std::cout << "Vertex shader compile error: " << _vs.getCompilerLog() << std::endl;
+        exit(-666);
+      }
+      if(!_fs.compile()) {
+        std::cout << "Fragment shader compile error: " << _fs.getCompilerLog() << std::endl;
+        exit(-666);
+      }
+      _prog.attachShader(_vs);
+      _prog.attachShader(_fs);
+      if( _prog.link() != GL_TRUE ) {
+        std::cout << "Render prog link error: " << _prog.getLinkerLog() << std::endl;
+        exit(-666);
+      }
 
 
-  int         textureId() const override { return _tex.getId(); }
-  bool        hasAlphaChannel() const override { return true; }
-  bool        hasMipmaps() const override { return false; }
-  QSize       textureSize() const override { return _size; }
+      const GLfloat values[] = {
+          -1.0f, -1.0f,
+           1.0f, -1.0f,
+          -1.0f,  1.0f,
+           1.0f,  1.0f
+      };
 
-  void        bind() override { _tex.bind(); }
-
-  bool        updateTexture() override { return true; }
-
-private:
-  GMlib::GL::Texture    _tex;
-  QSize                 _size;
-
-};
+      _vbo.create();
+      _vbo.bufferData( 2 * 4 * sizeof(GLfloat), values, GL_STATIC_DRAW );
+    }
 
 
+//      std::cout << "Prog OK!" << std::endl;
+
+
+    glViewport(_viewport.x(), _viewport.y(), _viewport.width(), _viewport.height());
+
+//      glDisable(GL_DEPTH_TEST);
+
+//      glClearColor(0, 0, 0, 1);
+//      glClear(GL_COLOR_BUFFER_BIT);
+
+//      glDisable(GL_BLEND);
+//      glEnable(GL_BLEND);
+//      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+    _prog.bind(); {
+
+//        _prog.setUniform( "u_tex0", _tex, GL_TEXTURE0, GLuint(0) );
+      _prog.setUniform( "u_tex0", tex, GL_TEXTURE0, GLuint(0) );
+
+      GMlib::GL::AttributeLocation vert_loc = _prog.getAttributeLocation("vertices");
+
+      _vbo.bind();
+      _vbo.enableVertexArrayPointer( vert_loc, 2, GL_FLOAT, GL_FALSE, 0, static_cast<const GLvoid*>(nullptr) );
+      GL_CHECK(::glDrawArrays(GL_TRIANGLE_STRIP,0,4));
+      _vbo.disable(vert_loc);
+      _vbo.unbind();
+
+    } _prog.unbind();
+
+
+  }
+
+  void
+  Renderer::setName(const std::string &name) {
+    _name = name;
+  }
+
+  void
+  Renderer::setViewport(const QRectF &viewport ) {
+    _viewport = viewport;
+  }
+
+  void
+  Renderer::setViewport(int x, int y, int w, int h) {
+    setViewport( QRectF(x,y,w,h) );
+  }
+
+
+
+}
 
 
 
 
 
 
-class GMlibRenderTextureNode : public QSGSimpleTextureNode {
-public:
-  GMlibRenderTextureNode(const std::string& name)
-    : QSGSimpleTextureNode(), _texture {name} { setTexture(&_texture); }
-  ~GMlibRenderTextureNode() { setTexture(nullptr); }
-
-
-  void        setTexName( const std::string& name ) {  _texture.acquireTexId(name); }
-  void        setTexSize( const QSize& size ) {  _texture.setSize(size);  }
-  void        update() { _texture.updateTexture(); markDirty(QSGNode::DirtyGeometry); }
-
-private:
-  Texture           _texture;
-};
 
 
 
+GLSceneRenderer::GLSceneRenderer() : _renderer{nullptr}, _name{}, _paused{false} {
 
-
-
-
-
-
-
-
-
-
-GLSceneRenderer::GLSceneRenderer(QQuickItem *parent)
-  : QQuickItem(parent),
-    _tex_size(1,1),
-    _paused(true)
-{
   setFlag(ItemHasContents);
   setSmooth(false);
+  connect( this, &QQuickItem::windowChanged, this, &GLSceneRenderer::handleWindowChanged );
 }
 
-const QString&GLSceneRenderer::getTexName() const {
+const
+QString&  GLSceneRenderer::getTexName() const {
 
-  return _tex_name;
+  return _name;
 }
 
-void GLSceneRenderer::setTexName(const QString& tex_name) {
+void
+GLSceneRenderer::setTexName(const QString& name) {
 
-  _tex_name = tex_name;
-  forceRender();
+  _name = name;
+
+  if(!(_name.length() > 0))
+    _renderer.reset(nullptr);
+  else if(_renderer)
+    _renderer->setName(_name.toStdString());
 }
 
-bool GLSceneRenderer::isPaused() const {
+bool
+GLSceneRenderer::isPaused() const {
 
   return _paused;
 }
@@ -102,58 +179,67 @@ void GLSceneRenderer::setPaused(bool paused) {
   _paused = paused;
 }
 
-void GLSceneRenderer::forceRender() {
+void GLSceneRenderer::paint() {
 
-//  qDebug() << "Force render! : " << _tex_name;
-  emit signRenderGeometryChanged(_tex_name, boundingRect() );
+  qDebug() << "PAINT; item has content: " << ((flags() & QQuickItem::ItemHasContents) == QQuickItem::ItemHasContents ? "yes" : "no");
+//  qDebug() << "PAINT; flags: " << flags();
 }
 
-QSGNode* GLSceneRenderer::updatePaintNode(QSGNode* old_node, QQuickItem::UpdatePaintNodeData*) {
+void
+GLSceneRenderer::sync() {
 
-  if (width() <= 0 || height() <= 0 || _tex_name.length() <= 0 | _paused) {
+//  qDebug() << "_renderer" << _renderer.get();
 
-//    if( old_node ) delete old_node;
-    delete old_node;
-    return nullptr;
+  if(!_renderer && _name.length() > 0) {
+
+    Window *w = static_cast<Window*>(window());
+    _renderer = std::unique_ptr<Private::Renderer>(new Private::Renderer(_name.toStdString()));
+    connect( w, &Window::beforeRendering, _renderer.get(), &Private::Renderer::paint, Qt::DirectConnection );
   }
 
-  GMlibRenderTextureNode *node = static_cast<GMlibRenderTextureNode *>(old_node);
-  if( !node )
-    node = new GMlibRenderTextureNode(_tex_name.toStdString());
+  if( !_renderer )
+    return;
 
-  const QRectF r = boundingRect();
-  node->setRect( QRectF(r.left(), r.top()+r.height(), r.width(), -r.height() ) );
+  QRectF r = mapRectToScene(boundingRect());
+  QRectF cr(r.left(),window()->height()-r.bottom(), r.width(), r.height());
+  _renderer->setViewport(cr);
 
-  if( _tex_size != r.toRect().size() ) {
+  emit signViewportChanged(_name,r);
+}
 
-////    qDebug() << "old: " << _tex_size << ", new: " << r.toRect().size() << "  --> " << _tex_name;
-    _tex_size = r.toRect().size();
-    node->setTexSize(_tex_size);
-    emit signRenderGeometryChanged(_tex_name, r );
-  }
+void
+GLSceneRenderer::cleanup() {
 
-  node->update();
+  std::cout << "Cleanup" << std::endl;
+}
 
+void
+GLSceneRenderer::handleWindowChanged(QQuickWindow* window) {
+
+  if( !window ) return;
+
+  Window *w = dynamic_cast<Window*>(window);
+  if( !w ) return;
+
+  connect( w, &Window::beforeSynchronizing, this, &GLSceneRenderer::sync );
+  connect( w, &Window::beforeRendering, this, &GLSceneRenderer::paint );
+  connect( w, &Window::sceneGraphInvalidated, this, &GLSceneRenderer::cleanup );
+  connect( w, &Window::signFrameReady, this, &QQuickItem::update );
+  connect( this, &GLSceneRenderer::signViewportChanged, w, &Window::signGuiViewportChanged );
+}
+
+void GLSceneRenderer::itemChange(ItemChange change, const ItemChangeData& value) {
+
+  qDebug() << "GLSceneRenderer changes: " << _name << ", change: " << change << ", value: " << value.boolValue;
+  if(change == QQuickItem::ItemVisibleHasChanged && !value.boolValue)
+    _renderer.reset(nullptr);
+
+  QQuickItem::itemChange(change,value);
+}
+
+QSGNode*GLSceneRenderer::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*) {
+
+  qDebug() << "updatePaintNode; item has content: " << ((flags() & QQuickItem::ItemHasContents) == QQuickItem::ItemHasContents ? "yes" : "no");
   return node;
 }
 
-void GLSceneRenderer::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData& value) {
-
-  if( change == QQuickItem::ItemSceneChange ) {
-
-    if( value.window ) {
-
-      Window *w = qobject_cast<Window*>(window());
-      connect( w,     &Window::signFrameReady,
-               this,  &GLSceneRenderer::update );
-//      connect( this,  &GLSceneRenderer::signRenderGeometryChanged,
-//               w,     &Window::signSceneRenderGeometryChanged );
-    }
-  }
-}
-
-void GLSceneRenderer::geometryChanged(const QRectF& new_geometry, const QRectF& /*oldGeometry*/) {
-
-//  _tex_size = new_geometry.toRect().size();
-  //  emit signRenderGeometryChanged(_tex_name,new_geometry);
-}
