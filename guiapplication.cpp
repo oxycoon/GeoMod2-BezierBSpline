@@ -5,10 +5,7 @@
 #include "gmlibwrapper.h"
 
 // qt
-#include <QOpenGLContext>
-#include <QQuickItem>
 #include <QDebug>
-
 
 // stl
 #include <cassert>
@@ -18,7 +15,7 @@ std::unique_ptr<GuiApplication> GuiApplication::_instance {nullptr};
 
 
 GuiApplication::GuiApplication(int& argc, char *argv[]) :
-  QGuiApplication(argc, argv), _window( std::make_shared<Window>() ), _gmlib(nullptr)
+  QGuiApplication(argc, argv), _window{std::make_shared<Window>()}, _gmlib{nullptr}
 {
 
   assert(!_instance);
@@ -31,28 +28,27 @@ GuiApplication::GuiApplication(int& argc, char *argv[]) :
 
 void GuiApplication::onSGInit() {
 
-  QOpenGLContext *ctx = _window->openglContext();
-  if( !ctx->isValid() ) {
-
-    qCritical() << "OpenGLContext not valid";
-    exit(1);
-  }
-  qDebug() << "Initialized GLformat: " << ctx->format();
-
   // Init GMlibWrapper
-  _gmlib = std::make_shared<GMlibWrapper>(ctx);
+  _gmlib = std::make_shared<GMlibWrapper>(_window->openglContext());
   connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::signFrameReady );
   connect( _window.get(), &Window::signGuiViewportChanged, _gmlib.get(),  &GMlibWrapper::changeRenderGeometry );
 
   // Load gui qml
   _window->setSource( QUrl("qrc:/qml/main.qml") );
 
+  connect( _window.get(), &Window::signMousePressed, this, &GuiApplication::mousePressed );
+
   // Init test scene of the GMlib wrapper
-  _gmlib->initTestScene();
+  _gmlib->initScene();
 
   // Start simulator
   _gmlib->start();
 
+}
+
+void GuiApplication::mousePressed(const QString& render_name, const QPointF& pos) {
+
+  qDebug() << "Mouse pressed: " << pos << " in render <" << render_name << ">";
 }
 
 const GuiApplication&

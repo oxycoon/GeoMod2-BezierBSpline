@@ -2,6 +2,7 @@
 
 
 #include "testtorus.h"
+#include "utils.h"
 
 
 // GMlib
@@ -17,6 +18,7 @@
 #include <QDebug>
 
 // stl
+#include <stdexcept>
 #include <thread>
 #include <mutex>
 
@@ -60,10 +62,14 @@ std::unique_ptr<GMlibWrapper> GMlibWrapper::_instance {nullptr};
 
 
 
-GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context)
+GMlibWrapper::GMlibWrapper(QOpenGLContext *glcontext)
 //  : GMlibWrapper()
   : QObject(), _timer_id{0}
 {
+
+  if( !glcontext->isValid() ) throw std::invalid_argument("OpenGLContext provided not valid!" + __EXCEPTION_TAIL);
+
+  qDebug() << "Initialized GL Context Format: " << glcontext->format();
 
   if(_instance != nullptr) {
 
@@ -78,8 +84,8 @@ GMlibWrapper::GMlibWrapper(QOpenGLContext *top_context)
 
   // Create Internal shared GL context
   _context = std::make_shared<QOpenGLContext>();
-  _context->setShareContext( top_context );
-  _context->setFormat( top_context->format() );
+  _context->setShareContext( glcontext );
+  _context->setFormat( glcontext->format() );
   _context->create();
 
   // Set up offscreen rendering surface for GMlib rendering
@@ -234,7 +240,7 @@ void GMlibWrapper::stop() {
   _timer_id = 0;
 }
 
-void GMlibWrapper::initTestScene() {
+void GMlibWrapper::initScene() {
 
   // Make OpenGL context current on offscreensurface
   Private::CurrentContextLock ccxt(_context,_offscreensurface);
@@ -327,7 +333,8 @@ GMlibWrapper::getScene() const {
 const GMlib::TextureRenderTarget&
 GMlibWrapper::getRenderTextureOf(const std::string& name) const {
 
-  assert(_rc_pairs.count(name));
+  if(!_rc_pairs.count(name)) throw std::invalid_argument("[][]Render/Camera pair '" + name + "'  does not exist!");
+
   return _rc_pairs.at(name).render->getFrontRenderTarget();
 }
 

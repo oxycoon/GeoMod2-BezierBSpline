@@ -80,7 +80,7 @@ private:
 
 signals:
   void                  signViewportChanged( const QString& name, const QRectF& size );
-  void                  signMousePressed(const QPointF& pos );
+  void                  signMousePressed( const QString& name, const QPointF& pos );
 
 public slots:
   void                  sync();

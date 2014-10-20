@@ -55,7 +55,8 @@ public:
   const GMlib::TextureRenderTarget&     getRenderTextureOf( const std::string& name ) const;
 
 
-  void                                  initTestScene();
+
+  void                                  initScene();
 
 public slots:
   void                                  changeRenderGeometry( const QString& name,

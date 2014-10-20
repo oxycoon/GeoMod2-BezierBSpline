@@ -8,6 +8,9 @@
 // qt
 #include <QDebug>
 
+// stl
+#include <stdexcept>
+
 int main(int argc, char *argv[]) try {
 
   // Checking Qt Development Framework Version
@@ -25,11 +28,11 @@ int main(int argc, char *argv[]) try {
 
 
   // Checking GMlib Version
-  if( GM_VERSION < GM_VERSION_CHECK( 0, 4, 0 ) ) {
+  if( GM_VERSION < GM_VERSION_CHECK( 0,5, 0 ) ) {
 
     QString critical = QString(
       "GMlib version %1 not supported."
-      "At least GMlib version 0.4.0 needed. Please Rebuild GMlib"
+      "At least GMlib version 0.5.0 needed. Please Rebuild GMlib"
     ).arg( GM_VERSION_STR );
     qCritical() << critical;
     return 0;
@@ -46,9 +49,15 @@ int main(int argc, char *argv[]) try {
   // Start the app, and return control to the Qt system.
   return a.exec();
 }
+catch(const std::invalid_argument& e) {
+  std::cerr << "std::invlid_argument " << e.what() << std::endl;
+  exit(1);
+}
 catch(const std::exception& e) {
-  std::cerr << "some exception: " << e.what() << std::endl;
+  std::cerr << "std::exception : " << e.what() << std::endl;
+  exit(1);
 }
 catch(...) {
-  std::cerr << "unknown exception!!" << std::endl;
+  std::cerr << "exception!!" << std::endl;
+  exit(1);
 }

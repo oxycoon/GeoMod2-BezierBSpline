@@ -220,6 +220,7 @@ GLSceneRenderer::handleWindowChanged(QQuickWindow* window) {
   connect( w, &Window::sceneGraphInvalidated, this, &GLSceneRenderer::cleanup );
   connect( w, &Window::signFrameReady, this, &QQuickItem::update );
   connect( this, &GLSceneRenderer::signViewportChanged, w, &Window::signGuiViewportChanged );
+  connect( this, &GLSceneRenderer::signMousePressed, w, &Window::signMousePressed );
 }
 
 void GLSceneRenderer::itemChange(ItemChange change, const ItemChangeData& value) {
@@ -241,6 +242,7 @@ void GLSceneRenderer::mousePressEvent(QMouseEvent* event) {
 
   qDebug() << "Mouse evnet at " << event->pos();
   setFocus(true,Qt::MouseFocusReason);
+  emit signMousePressed(_name,event->localPos());
 }
 
 void GLSceneRenderer::keyPressEvent(QKeyEvent* event) {

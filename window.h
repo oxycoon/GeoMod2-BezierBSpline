@@ -11,6 +11,9 @@ public:
 signals:
   void      signGuiViewportChanged( const QString& name, const QRectF& new_geometry );
   void      signFrameReady();
+
+  // Relay singals from qml side
+  void      signMousePressed( const QString& render_name, const QPointF& pos );
 };
 
 #endif // WINDOW_H

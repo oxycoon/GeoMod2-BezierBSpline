@@ -24,8 +24,13 @@ private:
   std::shared_ptr<Window>         _window;
   std::shared_ptr<GMlibWrapper>   _gmlib;
 
+
+  void                        setupScene();
+
 private slots:
   void                        onSGInit();
+
+  void                        mousePressed( const QString& render_name, const QPointF& pos );
 
 private:
   static std::unique_ptr<GuiApplication>    _instance;

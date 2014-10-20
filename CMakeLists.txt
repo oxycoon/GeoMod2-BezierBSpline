@@ -60,6 +60,7 @@ set( HDRS
   guiapplication.h
   window.h
   testtorus.h
+  utils.h
   )
 
 set( SRCS
