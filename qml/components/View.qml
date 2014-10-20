@@ -19,29 +19,23 @@ Item {
     visible: false // root.resizing
   }
 
-  FocusScope {
-    id: scope
+  GLSceneRenderer{
+    id: renderer
     anchors.fill: parent
-
-    //    GLSceneRenderer {
-    GLSceneRenderer{
-      id: renderer
-      anchors.fill: parent
-      name: root.name
+    name: root.name
 //      visible: !root.resizing
-      paused: false
+    paused: false
 //      view_type: root.view_type
 
-      Label {
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.margins: 5
-        text: root.name
-        color: "white"
-        font {
-          bold: true
-          weight: Font.Black
-        }
+    Label {
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.margins: 5
+      text: root.name
+      color: "white"
+      font {
+        bold: true
+        weight: Font.Black
       }
     }
   }

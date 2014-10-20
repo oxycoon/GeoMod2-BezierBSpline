@@ -73,14 +73,6 @@ public:
   bool                  isPaused() const;
   void                  setPaused( bool paused );
 
-public slots:
-  void                  paint();
-  void                  sync();
-  void                  cleanup();
-
-private slots:
-  void                  handleWindowChanged( QQuickWindow * window );
-
 private:
   std::unique_ptr<Private::Renderer>      _renderer;
   QString                                 _name;
@@ -88,10 +80,22 @@ private:
 
 signals:
   void                  signViewportChanged( const QString& name, const QRectF& size );
+  void                  signMousePressed(const QPointF& pos );
+
+public slots:
+  void                  sync();
+  void                  cleanup();
 
 protected slots:
   void                  itemChange(ItemChange change, const ItemChangeData& value ) override;
   QSGNode*              updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
+
+  void                  mousePressEvent(QMouseEvent *event) override;
+
+  void                  keyPressEvent(QKeyEvent *event) override;
+
+private slots:
+  void                  handleWindowChanged( QQuickWindow * window );
 
 
 };

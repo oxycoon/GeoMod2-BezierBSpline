@@ -18,17 +18,17 @@ namespace Private {
   void
   Renderer::paint() {
 
-      qDebug() << "Painting on viewport " << _name.c_str() << ": " << _viewport;
+//      qDebug() << "Painting on viewport " << _name.c_str() << ": " << _viewport;
 
     assert(_name.length());
 
-    qDebug() << "Renderer::paint; " << _name.c_str();
+//    qDebug() << "Renderer::paint; " << _name.c_str();
 
     const GMlib::TextureRenderTarget &render_tex = GMlibWrapper::getInstance().getRenderTextureOf(_name);
     const GMlib::GL::Texture& tex = render_tex.getTexture();
 
     if( !_prog.isValid() ) {
-      std::cout << "Prog ! valid: setting up." << std::endl;
+//      std::cout << "Prog ! valid: setting up." << std::endl;
 
       _vs.create();
       _fs.create();
@@ -146,6 +146,7 @@ namespace Private {
 
 GLSceneRenderer::GLSceneRenderer() : _renderer{nullptr}, _name{}, _paused{false} {
 
+  setAcceptedMouseButtons(Qt::AllButtons);
   setFlag(ItemHasContents);
   setSmooth(false);
   connect( this, &QQuickItem::windowChanged, this, &GLSceneRenderer::handleWindowChanged );
@@ -177,12 +178,6 @@ GLSceneRenderer::isPaused() const {
 void GLSceneRenderer::setPaused(bool paused) {
 
   _paused = paused;
-}
-
-void GLSceneRenderer::paint() {
-
-  qDebug() << "PAINT; item has content: " << ((flags() & QQuickItem::ItemHasContents) == QQuickItem::ItemHasContents ? "yes" : "no");
-//  qDebug() << "PAINT; flags: " << flags();
 }
 
 void
@@ -222,7 +217,6 @@ GLSceneRenderer::handleWindowChanged(QQuickWindow* window) {
   if( !w ) return;
 
   connect( w, &Window::beforeSynchronizing, this, &GLSceneRenderer::sync );
-  connect( w, &Window::beforeRendering, this, &GLSceneRenderer::paint );
   connect( w, &Window::sceneGraphInvalidated, this, &GLSceneRenderer::cleanup );
   connect( w, &Window::signFrameReady, this, &QQuickItem::update );
   connect( this, &GLSceneRenderer::signViewportChanged, w, &Window::signGuiViewportChanged );
@@ -230,7 +224,7 @@ GLSceneRenderer::handleWindowChanged(QQuickWindow* window) {
 
 void GLSceneRenderer::itemChange(ItemChange change, const ItemChangeData& value) {
 
-  qDebug() << "GLSceneRenderer changes: " << _name << ", change: " << change << ", value: " << value.boolValue;
+//  qDebug() << "GLSceneRenderer changes: " << _name << ", change: " << change << ", value: " << value.boolValue;
   if(change == QQuickItem::ItemVisibleHasChanged && !value.boolValue)
     _renderer.reset(nullptr);
 
@@ -239,7 +233,18 @@ void GLSceneRenderer::itemChange(ItemChange change, const ItemChangeData& value)
 
 QSGNode*GLSceneRenderer::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*) {
 
-  qDebug() << "updatePaintNode; item has content: " << ((flags() & QQuickItem::ItemHasContents) == QQuickItem::ItemHasContents ? "yes" : "no");
+//  qDebug() << "updatePaintNode; item has content: " << ((flags() & QQuickItem::ItemHasContents) == QQuickItem::ItemHasContents ? "yes" : "no");
   return node;
+}
+
+void GLSceneRenderer::mousePressEvent(QMouseEvent* event) {
+
+  qDebug() << "Mouse evnet at " << event->pos();
+  setFocus(true,Qt::MouseFocusReason);
+}
+
+void GLSceneRenderer::keyPressEvent(QKeyEvent* event) {
+
+  qDebug() << "Key pressed: " << event->key();
 }
 
