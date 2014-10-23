@@ -14,8 +14,9 @@
 std::unique_ptr<GuiApplication> GuiApplication::_instance {nullptr};
 
 
-GuiApplication::GuiApplication(int& argc, char *argv[]) :
-  QGuiApplication(argc, argv), _window{std::make_shared<Window>()}, _gmlib{nullptr}
+GuiApplication::GuiApplication(int& argc, char *argv[])
+  : QGuiApplication(argc, argv),
+    _window{std::make_shared<Window>()}, _gmlib{nullptr}
 {
 
   assert(!_instance);
@@ -43,7 +44,6 @@ void GuiApplication::onSGInit() {
 
   // Start simulator
   _gmlib->start();
-
 }
 
 void GuiApplication::mousePressed(const QString& render_name, const QPointF& pos) {

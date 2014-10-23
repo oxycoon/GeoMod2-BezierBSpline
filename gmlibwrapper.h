@@ -1,4 +1,8 @@
+#include "glcontextsurfacewrapper.h"
+
 // gmlib
+#include "core/gmpoint"
+
 namespace GMlib {
 
   class Scene;
@@ -10,14 +14,11 @@ namespace GMlib {
   class PSurf;
 }
 
-#include "core/gmpoint"
-
 // qt
 #include <QObject>
 #include <QSize>
 #include <QRectF>
 class QOpenGLContext;
-class QOffscreenSurface;
 class QOpenGLFramebufferObject;
 
 
@@ -45,7 +46,7 @@ class GMlibWrapper : public QObject {
 //private:
 //  explicit GMlibWrapper();
 public:
-  explicit GMlibWrapper( QOpenGLContext *top_ctx);
+  explicit GMlibWrapper( QOpenGLContext* context );
   ~GMlibWrapper();
 
   void                                  start();
@@ -54,9 +55,8 @@ public:
   const std::shared_ptr<GMlib::Scene>&  getScene() const;
   const GMlib::TextureRenderTarget&     getRenderTextureOf( const std::string& name ) const;
 
-
-
   void                                  initScene();
+
 
 public slots:
   void                                  changeRenderGeometry( const QString& name,
@@ -66,19 +66,14 @@ protected:
   void                                  timerEvent(QTimerEvent *e);
 
 
-
 private:
   int                                               _timer_id;
-  std::shared_ptr<QOpenGLContext>                   _context;
-  std::shared_ptr<QOffscreenSurface>                _offscreensurface;
+  GLContextSurfaceWrapper                           _glsurface;
+
   std::shared_ptr<GMlib::Scene>                     _scene;
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
 
-  std::shared_ptr<GMlib::PSurf<float,3>>            _world;
-  std::shared_ptr<GMlib::PSurf<float,3>>            _obj;
-  GMlib::Point<float,2>                             _obj_pos;
-
-  void                                              moveObj( const GMlib::Vector<float,2>& dir );
+  std::shared_ptr<GMlib::PSurf<float,3>>            _torus;
 
 signals:
   void                                              signFrameReady();

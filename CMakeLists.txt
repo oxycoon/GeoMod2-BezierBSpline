@@ -54,6 +54,7 @@ endif(WIN32)
 # Files
 
 set( HDRS
+  glcontextsurfacewrapper.h
   glscenerenderer.h
   gmlibwrapper.h
   guiapplication.h
@@ -63,6 +64,7 @@ set( HDRS
   )
 
 set( SRCS
+  glcontextsurfacewrapper.cpp
   glscenerenderer.cpp
   gmlibwrapper.cpp
   guiapplication.cpp
