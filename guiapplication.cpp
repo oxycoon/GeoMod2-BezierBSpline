@@ -37,7 +37,7 @@ void GuiApplication::onSGInit() {
   // Load gui qml
   _window->setSource( QUrl("qrc:/qml/main.qml") );
 
-  connect( _window.get(), &Window::signMousePressed, this, &GuiApplication::mousePressed );
+  connect( _window.get(), &Window::signMousePressed, _gmlib.get(), &GMlibWrapper::mousePressed );
 
   // Init test scene of the GMlib wrapper
   _gmlib->initScene();

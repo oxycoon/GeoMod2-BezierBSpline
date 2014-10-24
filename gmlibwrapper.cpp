@@ -29,7 +29,7 @@ std::unique_ptr<GMlibWrapper> GMlibWrapper::_instance {nullptr};
 
 GMlibWrapper::GMlibWrapper(QOpenGLContext *context)
 //  : GMlibWrapper()
-  : QObject(), _timer_id{0}, _glsurface{context}
+  : QObject(), _timer_id{0}, _glsurface{context}, _select_renderer{nullptr}
 {
 
   if(_instance != nullptr) {
@@ -78,14 +78,34 @@ void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& geome
   rc_pair.viewport.changed = true;
 }
 
+void GMlibWrapper::mousePressed(const QString& name, const QPointF& pos) {
+
+
+  const auto& rc_select = _rc_pairs.at(name.toStdString());
+
+
+
+  GMlib::Vector<int,2> size(2,2);
+  _select_renderer->setCamera(rc_select.camera);
+
+  GMlib::DisplayObject* obj = {nullptr};
+  _glsurface.makeCurrent(); {
+
+    _select_renderer->reshape( size );
+    _select_renderer->select( 0 );
+
+    _select_renderer->prepare();
+
+    obj = _select_renderer->findObject(pos.x(),pos.y());
+
+  } _glsurface.doneCurrent();
+
+  qDebug() << "Making a selection in " << name << " at " << pos << " of camera " << rc_select.camera << "; found: " << obj;
+}
+
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
-//  if( !_context->isValid() )
-//    return;
-
   e->accept();
-
-
 
   // Simuation order
   // 1) Prepare must be run first
@@ -218,6 +238,8 @@ void GMlibWrapper::initScene() {
     top_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
 
+    // Setup Select Renderer
+    _select_renderer = std::make_shared<GMlib::DefaultSelectRenderer>();
 
 
     // My test torus

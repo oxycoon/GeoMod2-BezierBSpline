@@ -8,6 +8,7 @@ namespace GMlib {
   class Scene;
   class Camera;
   class DefaultRenderer;
+  class DefaultSelectRenderer;
   class TextureRenderTarget;
 
   template<typename T, int n>
@@ -62,6 +63,9 @@ public slots:
   void                                  changeRenderGeometry( const QString& name,
                                                               const QRectF &new_geometry );
 
+
+  void                                  mousePressed( const QString& name, const QPointF& pos );
+
 protected:
   void                                  timerEvent(QTimerEvent *e);
 
@@ -72,6 +76,7 @@ private:
 
   std::shared_ptr<GMlib::Scene>                     _scene;
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
+  std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
 
   std::shared_ptr<GMlib::PSurf<float,3>>            _torus;
 
