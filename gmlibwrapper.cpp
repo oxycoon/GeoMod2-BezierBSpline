@@ -82,10 +82,11 @@ void GMlibWrapper::mousePressed(const QString& name, const QPointF& pos) {
 
 
   const auto& rc_select = _rc_pairs.at(name.toStdString());
+  const auto& rc_geo = rc_select.viewport.geometry;
 
 
 
-  GMlib::Vector<int,2> size(2,2);
+  GMlib::Vector<int,2> size(rc_geo.width(),rc_geo.height());
   _select_renderer->setCamera(rc_select.camera);
 
   GMlib::DisplayObject* obj = {nullptr};
@@ -96,11 +97,11 @@ void GMlibWrapper::mousePressed(const QString& name, const QPointF& pos) {
 
     _select_renderer->prepare();
 
-    obj = _select_renderer->findObject(pos.x(),pos.y());
+    obj = _select_renderer->findObject(pos.x(),size(1)-pos.y()-1);
 
   } _glsurface.doneCurrent();
 
-  qDebug() << "Making a selection in " << name << " at " << pos << " of camera " << rc_select.camera << "; found: " << obj;
+  if(obj) obj->toggleSelected();
 }
 
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
