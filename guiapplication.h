@@ -30,8 +30,6 @@ private:
 private slots:
   void                        onSGInit();
 
-  void                        mousePressed( const QString& render_name, const QPointF& pos );
-
 private:
   static std::unique_ptr<GuiApplication>    _instance;
 public:

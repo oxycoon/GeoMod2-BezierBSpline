@@ -21,6 +21,8 @@ namespace GMlib {
 #include <QRectF>
 class QOpenGLContext;
 class QOpenGLFramebufferObject;
+class QMouseEvent;
+class QKeyEvent;
 
 
 // stl
@@ -64,7 +66,8 @@ public slots:
                                                               const QRectF &new_geometry );
 
 
-  void                                  mousePressed( const QString& name, const QPointF& pos );
+  void                                  mousePressed( const QString& name, QMouseEvent* event );
+  void                                  keyPressed( const QString& name, QKeyEvent* event );
 
 protected:
   void                                  timerEvent(QTimerEvent *e);

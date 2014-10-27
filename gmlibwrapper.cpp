@@ -13,6 +13,7 @@
 // Qt
 #include <QTimerEvent>
 #include <QRectF>
+#include <QMouseEvent>
 #include <QDebug>
 
 // stl
@@ -78,13 +79,12 @@ void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& geome
   rc_pair.viewport.changed = true;
 }
 
-void GMlibWrapper::mousePressed(const QString& name, const QPointF& pos) {
+void GMlibWrapper::mousePressed(const QString& name, QMouseEvent* event ) {
 
+  const QPointF& pos = event->pos();
 
   const auto& rc_select = _rc_pairs.at(name.toStdString());
   const auto& rc_geo = rc_select.viewport.geometry;
-
-
 
   GMlib::Vector<int,2> size(rc_geo.width(),rc_geo.height());
   _select_renderer->setCamera(rc_select.camera);
@@ -102,6 +102,12 @@ void GMlibWrapper::mousePressed(const QString& name, const QPointF& pos) {
   } _glsurface.doneCurrent();
 
   if(obj) obj->toggleSelected();
+}
+
+void GMlibWrapper::keyPressed(const QString& name, QKeyEvent* event) {
+  Q_UNUSED(name)
+
+  if( event->key() == Qt::Key_R ) _scene->toggleRun();
 }
 
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
@@ -156,19 +162,19 @@ GMlibWrapper::getInstance() {
 
 void GMlibWrapper::start() {
 
-  if( _timer_id )
+  if( _timer_id || _scene->isRunning() )
     return;
 
   _timer_id = startTimer(16, Qt::PreciseTimer);
-  _scene->toggleRun();
+  _scene->start();
 }
 
 void GMlibWrapper::stop() {
 
-  if( !_timer_id )
+  if( !_timer_id || !_scene->isRunning() )
     return;
 
-  _scene->toggleRun();
+  _scene->stop();
   killTimer(_timer_id);
   _timer_id = 0;
 }

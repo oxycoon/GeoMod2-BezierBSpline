@@ -27,7 +27,8 @@ GuiApplication::GuiApplication(int& argc, char *argv[])
   _window->show();
 }
 
-void GuiApplication::onSGInit() {
+void
+GuiApplication::onSGInit() {
 
   // Init GMlibWrapper
   _gmlib = std::make_shared<GMlibWrapper>(_window->openglContext());
@@ -38,17 +39,13 @@ void GuiApplication::onSGInit() {
   _window->setSource( QUrl("qrc:/qml/main.qml") );
 
   connect( _window.get(), &Window::signMousePressed, _gmlib.get(), &GMlibWrapper::mousePressed );
+  connect( _window.get(), &Window::signKeyPressed, _gmlib.get(), &GMlibWrapper::keyPressed );
 
   // Init test scene of the GMlib wrapper
   _gmlib->initScene();
 
   // Start simulator
   _gmlib->start();
-}
-
-void GuiApplication::mousePressed(const QString& render_name, const QPointF& pos) {
-
-  qDebug() << "Mouse pressed: " << pos << " in render <" << render_name << ">";
 }
 
 const GuiApplication&

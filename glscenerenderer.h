@@ -80,7 +80,8 @@ private:
 
 signals:
   void                  signViewportChanged( const QString& name, const QRectF& size );
-  void                  signMousePressed( const QString& name, const QPointF& pos );
+  void                  signMousePressed( const QString& name, QMouseEvent* event );
+  void                  signKeyPressed( const QString& name, QKeyEvent* event );
 
 public slots:
   void                  sync();
@@ -91,7 +92,6 @@ protected slots:
   QSGNode*              updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
 
   void                  mousePressEvent(QMouseEvent *event) override;
-
   void                  keyPressEvent(QKeyEvent *event) override;
 
 private slots:

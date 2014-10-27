@@ -13,7 +13,8 @@ signals:
   void      signFrameReady();
 
   // Relay singals from qml side
-  void      signMousePressed( const QString& render_name, const QPointF& pos );
+  void      signMousePressed( const QString& name, QMouseEvent* event );
+  void      signKeyPressed( const QString& name, QKeyEvent* event );
 };
 
 #endif // WINDOW_H
