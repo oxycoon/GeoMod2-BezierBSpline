@@ -1,5 +1,7 @@
 #include "guiapplication.h"
 
+#include "glcontextsurfacewrapper.h"
+
 // local
 #include "window.h"
 #include "gmlibwrapper.h"
@@ -16,7 +18,7 @@ std::unique_ptr<GuiApplication> GuiApplication::_instance {nullptr};
 
 GuiApplication::GuiApplication(int& argc, char *argv[])
   : QGuiApplication(argc, argv),
-    _window{std::make_shared<Window>()}, _gmlib{nullptr}
+    _window{std::make_shared<Window>()}, _gmlib{nullptr}, _glsurface{nullptr}
 {
 
   assert(!_instance);
@@ -27,11 +29,22 @@ GuiApplication::GuiApplication(int& argc, char *argv[])
   _window->show();
 }
 
+GuiApplication::~GuiApplication() {
+
+  _glsurface->makeCurrent(); {
+
+    _gmlib.reset();
+    _window.reset();
+
+  } _glsurface->doneCurrent();
+}
+
 void
 GuiApplication::onSGInit() {
 
   // Init GMlibWrapper
-  _gmlib = std::make_shared<GMlibWrapper>(_window->openglContext());
+  _glsurface = std::make_shared<GLContextSurfaceWrapper>(_window->openglContext());
+  _gmlib = std::make_shared<GMlibWrapper>(_glsurface);
   connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::signFrameReady );
   connect( _window.get(), &Window::signGuiViewportChanged, _gmlib.get(),  &GMlibWrapper::changeRenderGeometry );
 

@@ -1,4 +1,5 @@
-#include "glcontextsurfacewrapper.h"
+
+class GLContextSurfaceWrapper;
 
 // gmlib
 #include "core/gmpoint"
@@ -7,6 +8,7 @@ namespace GMlib {
 
   class Scene;
   class Camera;
+  class PointLight;
   class DefaultRenderer;
   class DefaultSelectRenderer;
   class TextureRenderTarget;
@@ -32,8 +34,8 @@ class QKeyEvent;
 
 struct RenderCamPair {
   RenderCamPair() : render{nullptr}, camera{nullptr} {}
-  GMlib::DefaultRenderer*       render;
-  GMlib::Camera*                camera;
+  std::shared_ptr<GMlib::DefaultRenderer>     render;
+  std::shared_ptr<GMlib::Camera>              camera;
   struct {
     QRectF                      geometry { QRectF(0,0,200,200) };
     bool                        changed {true};
@@ -49,7 +51,7 @@ class GMlibWrapper : public QObject {
 //private:
 //  explicit GMlibWrapper();
 public:
-  explicit GMlibWrapper( QOpenGLContext* context );
+  explicit GMlibWrapper(std::shared_ptr<GLContextSurfaceWrapper> wrapper );
   ~GMlibWrapper();
 
   void                                  start();
@@ -75,12 +77,14 @@ protected:
 
 private:
   int                                               _timer_id;
-  GLContextSurfaceWrapper                           _glsurface;
+
+  std::shared_ptr<GLContextSurfaceWrapper>          _glsurface;
 
   std::shared_ptr<GMlib::Scene>                     _scene;
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
   std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
 
+  std::shared_ptr<GMlib::PointLight>                _light;
   std::shared_ptr<GMlib::PSurf<float,3>>            _torus;
 
 signals:

@@ -1,4 +1,5 @@
 #include "gmlibwrapper.h"
+#include "glcontextsurfacewrapper.h"
 
 
 #include "testtorus.h"
@@ -28,9 +29,9 @@
 std::unique_ptr<GMlibWrapper> GMlibWrapper::_instance {nullptr};
 
 
-GMlibWrapper::GMlibWrapper(QOpenGLContext *context)
+GMlibWrapper::GMlibWrapper(std::shared_ptr<GLContextSurfaceWrapper> context)
 //  : GMlibWrapper()
-  : QObject(), _timer_id{0}, _glsurface{context}, _select_renderer{nullptr}
+  : QObject(), _timer_id{0}, _glsurface(context), _select_renderer{nullptr}
 {
 
   if(_instance != nullptr) {
@@ -44,7 +45,7 @@ GMlibWrapper::GMlibWrapper(QOpenGLContext *context)
 
   _instance = std::unique_ptr<GMlibWrapper>(this);
 
-  _glsurface.makeCurrent();
+  _glsurface->makeCurrent();
 
   // Setup and initialized GMlib GL backend
   GMlib::GL::OpenGLManager::init();
@@ -57,8 +58,26 @@ GMlibWrapper::~GMlibWrapper() {
 
   stop();
 
-  _scene->clear();
+  _glsurface->makeCurrent(); {
 
+    _select_renderer->releaseCamera();
+    _select_renderer.reset();
+
+    for( auto& rc_pair : _rc_pairs ) {
+
+      rc_pair.second.render->releaseCamera();
+      _scene->removeCamera( rc_pair.second.camera.get() );
+
+      rc_pair.second.render.reset();
+      rc_pair.second.camera.reset();
+    }
+
+    _scene->removeLight(_light.get());
+
+    _scene->remove(_torus.get());
+    _torus.reset();
+
+  } _glsurface->doneCurrent();
 }
 
 void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& geometry) {
@@ -87,10 +106,10 @@ void GMlibWrapper::mousePressed(const QString& name, QMouseEvent* event ) {
   const auto& rc_geo = rc_select.viewport.geometry;
 
   GMlib::Vector<int,2> size(rc_geo.width(),rc_geo.height());
-  _select_renderer->setCamera(rc_select.camera);
+  _select_renderer->setCamera(rc_select.camera.get());
 
   GMlib::DisplayObject* obj = {nullptr};
-  _glsurface.makeCurrent(); {
+  _glsurface->makeCurrent(); {
 
     _select_renderer->reshape( size );
     _select_renderer->select( 0 );
@@ -99,7 +118,7 @@ void GMlibWrapper::mousePressed(const QString& name, QMouseEvent* event ) {
 
     obj = _select_renderer->findObject(pos.x(),size(1)-pos.y()-1);
 
-  } _glsurface.doneCurrent();
+  } _glsurface->doneCurrent();
 
   if(obj) obj->toggleSelected();
 }
@@ -120,7 +139,7 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
 
   // Grab and activate GL context
-  _glsurface.makeCurrent(); {
+  _glsurface->makeCurrent(); {
 
     // 1)
     _scene->prepare();
@@ -150,7 +169,7 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
     for( auto& thread : threads )
       thread.join();
 
-  } _glsurface.doneCurrent();
+  } _glsurface->doneCurrent();
 
   emit signFrameReady();
 }
@@ -182,15 +201,15 @@ void GMlibWrapper::stop() {
 void GMlibWrapper::initScene() {
 
   // Make OpenGL context current on offscreensurface
-  _glsurface.makeCurrent(); {
+  _glsurface->makeCurrent(); {
 
     // Insert a light
     GMlib::Point<GLfloat,3> init_light_pos( 2.0, 4.0, 10 );
-    GMlib::PointLight *pl = new GMlib::PointLight(
+    _light = std::make_shared<GMlib::PointLight>(
                               GMlib::GMcolor::White, GMlib::GMcolor::White,
                               GMlib::GMcolor::White, init_light_pos );
-    pl->setAttenuation(0.8, 0.002, 0.0008);
-    _scene->insertLight( pl, false );
+    _light->setAttenuation(0.8, 0.002, 0.0008);
+    _scene->insertLight( _light.get(), false );
 
     // Insert Sun
     _scene->insertSun();
@@ -209,9 +228,9 @@ void GMlibWrapper::initScene() {
 
     for( auto& rcpair : _rc_pairs ) {
 
-      rcpair.second.render = new GMlib::DefaultRenderer;
-      rcpair.second.camera = new GMlib::Camera;
-      rcpair.second.render->setCamera(rcpair.second.camera);
+      rcpair.second.render = std::make_shared<GMlib::DefaultRenderer>();
+      rcpair.second.camera = std::make_shared<GMlib::Camera>();
+      rcpair.second.render->setCamera(rcpair.second.camera.get());
     }
 
     // Projection cam
@@ -220,28 +239,28 @@ void GMlibWrapper::initScene() {
     proj_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
     proj_rcpair.camera->rotateGlobal( GMlib::Angle(-45), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ) );
     proj_rcpair.camera->translate( GMlib::Vector<float,3>( 0.0f, -20.0f, 20.0f ) );
-    _scene->insertCamera( proj_rcpair.camera );
+    _scene->insertCamera( proj_rcpair.camera.get() );
     proj_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
     // Front cam
     auto& front_rcpair = _rc_pairs["Front"];
     front_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( 0.0f, -50.0f, 0.0f ), init_cam_dir, init_cam_up );
     front_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
-    _scene->insertCamera( front_rcpair.camera );
+    _scene->insertCamera( front_rcpair.camera.get() );
     front_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
     // Side cam
     auto& side_rcpair = _rc_pairs["Side"];
     side_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( -50.0f, 0.0f, 0.0f ), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ), init_cam_up );
     side_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
-    _scene->insertCamera( side_rcpair.camera );
+    _scene->insertCamera( side_rcpair.camera.get() );
     side_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
     // Top cam
     auto& top_rcpair = _rc_pairs["Top"];
     top_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( 0.0f, 0.0f, 50.0f ), -init_cam_up, init_cam_dir );
     top_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
-    _scene->insertCamera( top_rcpair.camera );
+    _scene->insertCamera( top_rcpair.camera.get() );
     top_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
 
@@ -255,7 +274,7 @@ void GMlibWrapper::initScene() {
     _torus->replot( 200, 200, 1, 1 );
     _scene->insert(_torus.get());
 
-  } _glsurface.doneCurrent();
+  } _glsurface->doneCurrent();
 }
 
 const std::shared_ptr<GMlib::Scene>&
