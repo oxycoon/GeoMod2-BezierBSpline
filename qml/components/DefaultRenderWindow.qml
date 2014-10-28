@@ -9,7 +9,9 @@ Item {
 
   View {
     id: singleview; anchors.fill: parent;
-    visible: true; name: "Projection";
+    visible: true;
+    name: "Projection";
+//    name: "Iso"
   }
 
 //  RelativeSplitView {

@@ -1,5 +1,6 @@
 #include "window.h"
 
+#include "glcontextsurfacewrapper.h"
 
 //qt
 #include <QQuickItem>
@@ -35,4 +36,8 @@ Window::Window(QWindow *parent) :
 
   // Create window
   create();
+}
+
+void Window::initGLSurface() {
+  _glsurface = std::make_shared<GLContextSurfaceWrapper>(openglContext());
 }

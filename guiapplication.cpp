@@ -42,8 +42,11 @@ GuiApplication::~GuiApplication() {
 void
 GuiApplication::onSGInit() {
 
+  // Init GLSurface
+  _window->initGLSurface();
+
   // Init GMlibWrapper
-  _glsurface = std::make_shared<GLContextSurfaceWrapper>(_window->openglContext());
+  _glsurface = _window->getGLSurface();
   _gmlib = std::make_shared<GMlibWrapper>(_glsurface);
   connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::signFrameReady );
   connect( _window.get(), &Window::signGuiViewportChanged, _gmlib.get(),  &GMlibWrapper::changeRenderGeometry );

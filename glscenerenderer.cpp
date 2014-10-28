@@ -1,5 +1,6 @@
 #include "glscenerenderer.h"
 #include "window.h"
+#include "glcontextsurfacewrapper.h"
 
 // Qt
 #include <QQuickWindow>
@@ -14,6 +15,8 @@
 namespace Private {
 
   Renderer::Renderer (const std::string& name) : _name{name} {}
+
+  Renderer::~Renderer() {}
 
   void
   Renderer::paint() {
@@ -144,12 +147,21 @@ namespace Private {
 
 
 
-GLSceneRenderer::GLSceneRenderer() : _renderer{nullptr}, _name{}, _paused{false} {
+GLSceneRenderer::GLSceneRenderer() : _renderer{nullptr}, _glsurface{nullptr}, _name{}, _paused{false} {
 
+  _renderer.reset();
   setAcceptedMouseButtons(Qt::AllButtons);
   setFlag(ItemHasContents);
   setSmooth(false);
   connect( this, &QQuickItem::windowChanged, this, &GLSceneRenderer::handleWindowChanged );
+}
+
+GLSceneRenderer::~GLSceneRenderer() {
+
+  _glsurface->makeCurrent(); {
+    if(_renderer)
+      _renderer.reset();
+  } _glsurface->doneCurrent();
 }
 
 const
@@ -164,7 +176,8 @@ GLSceneRenderer::setTexName(const QString& name) {
   _name = name;
 
   if(!(_name.length() > 0))
-    _renderer.reset(nullptr);
+    _renderer = nullptr;
+//    _renderer.reset(nullptr);
   else if(_renderer)
     _renderer->setName(_name.toStdString());
 }
@@ -188,7 +201,9 @@ GLSceneRenderer::sync() {
   if(!_renderer && _name.length() > 0) {
 
     Window *w = static_cast<Window*>(window());
-    _renderer = std::unique_ptr<Private::Renderer>(new Private::Renderer(_name.toStdString()));
+//    _renderer = std::unique_ptr<Private::Renderer>(new Private::Renderer(_name.toStdString()));
+    _renderer = std::shared_ptr<Private::Renderer>(new Private::Renderer(_name.toStdString()));
+    _glsurface = w->getGLSurface();
     connect( w, &Window::beforeRendering, _renderer.get(), &Private::Renderer::paint, Qt::DirectConnection );
   }
 
@@ -228,7 +243,7 @@ void GLSceneRenderer::itemChange(ItemChange change, const ItemChangeData& value)
 
 //  qDebug() << "GLSceneRenderer changes: " << _name << ", change: " << change << ", value: " << value.boolValue;
   if(change == QQuickItem::ItemVisibleHasChanged && !value.boolValue)
-    _renderer.reset(nullptr);
+    _renderer = nullptr;
 
   QQuickItem::itemChange(change,value);
 }

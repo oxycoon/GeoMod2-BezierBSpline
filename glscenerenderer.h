@@ -6,6 +6,10 @@
 
 #include "gmlibwrapper.h"
 
+
+class GLContextSurfaceWrapper;
+
+
 // gmlib
 #include <opengl/gmtexture>
 #include <opengl/gmprogram>
@@ -35,6 +39,7 @@ namespace Private {
     Q_OBJECT
   public:
     Renderer( const std::string& name );
+    ~Renderer();
 
     void      setName( const std::string& name );
 
@@ -66,6 +71,7 @@ class GLSceneRenderer : public QQuickItem {
 
 public:
   explicit GLSceneRenderer();
+  ~GLSceneRenderer();
 
   const QString&        getTexName() const;
   void                  setTexName( const QString& tex_name );
@@ -74,9 +80,10 @@ public:
   void                  setPaused( bool paused );
 
 private:
-  std::unique_ptr<Private::Renderer>      _renderer;
-  QString                                 _name;
-  bool                                    _paused;
+  std::shared_ptr<Private::Renderer>          _renderer;
+  std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;
+  QString                                     _name;
+  bool                                        _paused;
 
 signals:
   void                  signViewportChanged( const QString& name, const QRectF& size );

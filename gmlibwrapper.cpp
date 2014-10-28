@@ -144,10 +144,13 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
     // 1)
     _scene->prepare();
 
-    std::vector<std::thread> threads;
+
+    _scene->simulate();
+
+//    std::vector<std::thread> threads;
 
     // Add simulation thread
-    threads.push_back(std::thread(&GMlib::Scene::simulate,_scene));
+//    threads.push_back(std::thread(&GMlib::Scene::simulate,_scene));
 
     // Add Render threads
     for( auto& rc_pair : _rc_pairs ) {
@@ -166,8 +169,8 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
       rc_pair.second.render->swap();
     }
 
-    for( auto& thread : threads )
-      thread.join();
+//    for( auto& thread : threads )
+//      thread.join();
 
   } _glsurface->doneCurrent();
 
@@ -262,6 +265,25 @@ void GMlibWrapper::initScene() {
     top_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
     _scene->insertCamera( top_rcpair.camera.get() );
     top_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
+
+
+
+
+
+//    // Iso Camera
+//    auto& isorcpair = (_rc_pairs["Iso"] = RenderCamPair {});
+//    isorcpair.render = std::make_shared<GMlib::DefaultRenderer>();
+//    isorcpair.camera = std::make_shared<GMlib::IsoCamera>();
+//    isorcpair.render->setCamera(isorcpair.camera.get());
+//    _scene->insertCamera( isorcpair.camera.get() );
+//    isorcpair.camera->set(init_cam_pos,init_cam_dir,init_cam_up);
+//    isorcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
+//    isorcpair.camera->rotateGlobal( GMlib::Angle(-45), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ) );
+//    isorcpair.camera->translate( GMlib::Vector<float,3>( 0.0f, -20.0f, 20.0f ) );
+//    isorcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
+
+
+
 
 
     // Setup Select Renderer
