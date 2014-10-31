@@ -1,4 +1,5 @@
 
+class TestTorus;
 class GLContextSurfaceWrapper;
 
 // gmlib
@@ -85,7 +86,7 @@ private:
   std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
 
   std::shared_ptr<GMlib::PointLight>                _light;
-  std::shared_ptr<GMlib::PSurf<float,3>>            _torus;
+  std::shared_ptr<TestTorus>                        _torus;
 
 signals:
   void                                              signFrameReady();

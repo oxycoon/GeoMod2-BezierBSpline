@@ -108,7 +108,7 @@ void GMlibWrapper::mousePressed(const QString& name, QMouseEvent* event ) {
   GMlib::Vector<int,2> size(rc_geo.width(),rc_geo.height());
   _select_renderer->setCamera(rc_select.camera.get());
 
-  GMlib::DisplayObject* obj = {nullptr};
+  GMlib::SceneObject* obj = {nullptr};
   _glsurface->makeCurrent(); {
 
     _select_renderer->reshape( size );
@@ -293,8 +293,10 @@ void GMlibWrapper::initScene() {
     // My test torus
     _torus = std::make_shared<TestTorus>();
     _torus->toggleDefaultVisualizer();
-    _torus->replot( 200, 200, 1, 1 );
+    _torus->replot(200,200,1,1);
     _scene->insert(_torus.get());
+
+    _torus->test01();
 
   } _glsurface->doneCurrent();
 }
