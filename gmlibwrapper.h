@@ -50,8 +50,6 @@ struct RenderCamPair {
 
 class GMlibWrapper : public QObject {
   Q_OBJECT
-//private:
-//  explicit GMlibWrapper();
 public:
   explicit GMlibWrapper(std::shared_ptr<GLContextSurfaceWrapper> wrapper );
   ~GMlibWrapper();
@@ -90,9 +88,6 @@ private:
   std::shared_ptr<GMlib::Scene>                     _scene;
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
   std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
-
-//  std::shared_ptr<GMlib::PointLight>                _light;
-//  std::shared_ptr<TestTorus>                        _torus;
 
 signals:
   void                                              signFrameReady();

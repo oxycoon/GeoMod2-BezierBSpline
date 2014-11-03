@@ -370,9 +370,29 @@ void GMlibWrapper::keyReleased(const QString& name, QKeyEvent* event) {
 }
 
 void GMlibWrapper::wheelEventOccurred(const QString& name, QWheelEvent* event) {
-  Q_UNUSED(name)
-  Q_UNUSED(event)
 
-  qDebug() << "WheelEventOccurred";
+  int delta = event->delta();
+  auto& rc = _rc_pairs.at(name.toStdString());
+
+  const auto& camera_geo = rc.viewport.geometry;
+  auto camera    = rc.camera.get();
+  auto isocamera = dynamic_cast<GMlib::IsoCamera*>(camera);
+  if(isocamera) {
+
+    if( delta < 0 ) isocamera->zoom( 1.05 );
+    if( delta > 0 ) isocamera->zoom( 0.95 );
+  }
+  else if(camera) {
+
+    double scale;
+    if( camera->isLocked() )
+      scale = camera->getLockDist();
+    else
+      scale = getScene()->getSphere().getRadius();
+
+    camera->move( delta*scale / camera_geo.height());
+
+  }
+
 }
 
