@@ -48,7 +48,8 @@ GuiApplication::onSGInit() {
   // Init GMlibWrapper
   _glsurface = _window->getGLSurface();
   _gmlib = std::make_shared<GMlibWrapper>(_glsurface);
-  connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::signFrameReady );
+//  connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::signFrameReady );
+  connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::update );
   connect( _window.get(), &Window::signGuiViewportChanged, _gmlib.get(),  &GMlibWrapper::changeRenderGeometry );
 
   // Load gui qml
