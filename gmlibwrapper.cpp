@@ -72,10 +72,7 @@ GMlibWrapper::~GMlibWrapper() {
       rc_pair.second.camera.reset();
     }
 
-    _scene->removeLight(_light.get());
-
-    _scene->remove(_torus.get());
-    _torus.reset();
+    _scene->clear();
 
   } _glsurface->doneCurrent();
 }
@@ -162,6 +159,7 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
       if(rc_pair.second.viewport.changed) {
         const QSizeF size = rc_pair.second.viewport.geometry.size();
         rc_pair.second.render->reshape( GMlib::Vector<int,2>(size.width(),size.height()));
+        rc_pair.second.camera->reshape( 0, 0, size.width(), size.height() );
         rc_pair.second.viewport.changed = false;
       }
 
@@ -208,11 +206,10 @@ void GMlibWrapper::initScene() {
 
     // Insert a light
     GMlib::Point<GLfloat,3> init_light_pos( 2.0, 4.0, 10 );
-    _light = std::make_shared<GMlib::PointLight>(
-                              GMlib::GMcolor::White, GMlib::GMcolor::White,
-                              GMlib::GMcolor::White, init_light_pos );
-    _light->setAttenuation(0.8, 0.002, 0.0008);
-    _scene->insertLight( _light.get(), false );
+    GMlib::PointLight *light = new GMlib::PointLight(  GMlib::GMcolor::White, GMlib::GMcolor::White,
+                                                       GMlib::GMcolor::White, init_light_pos );
+    light->setAttenuation(0.8, 0.002, 0.0008);
+    _scene->insertLight( light, false );
 
     // Insert Sun
     _scene->insertSun();
@@ -283,20 +280,54 @@ void GMlibWrapper::initScene() {
 //    isorcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
 
-
-
-
     // Setup Select Renderer
     _select_renderer = std::make_shared<GMlib::DefaultSelectRenderer>();
 
 
-    // My test torus
-    _torus = std::make_shared<TestTorus>();
-    _torus->toggleDefaultVisualizer();
-    _torus->replot(200,200,1,1);
-    _scene->insert(_torus.get());
 
-    _torus->test01();
+//#define TEST_CURVE
+#define TEST_SURFACE
+
+
+#ifdef TEST_CURVE
+
+    // Curve visualizers
+    auto curve_visualizer = new GMlib::PCurveDerivativesVisualizer<float,3>;
+
+    // Curve
+    auto curve = new GMlib::PCircle<float>(2.0f);
+//    curve->toggleDefaultVisualizer();
+    curve->insertVisualizer(curve_visualizer);
+    curve->replot(100,1);
+    _scene->insert(curve);
+
+#endif
+
+
+
+
+
+#ifdef TEST_SURFACE
+
+    // Surface visualizers
+//    auto surface_visualizer = new GMlib::PSurfDerivativesVisualizer<float,3>;
+//    auto surface_visualizer = new GMlib::PSurfNormalsVisualizer<float,3>;
+//    auto surface_visualizer = new GMlib::PSurfParamLinesVisualizer<float,3>;
+    auto surface_visualizer = new GMlib::PSurfPointsVisualizer<float,3>;
+
+    // Surface
+    auto surface = new TestTorus;
+//    surface->toggleDefaultVisualizer();
+    surface->insertVisualizer(surface_visualizer);
+    surface->replot(200,200,1,1);
+    _scene->insert(surface);
+
+    surface->test01();
+
+#endif
+
+
+
 
   } _glsurface->doneCurrent();
 }

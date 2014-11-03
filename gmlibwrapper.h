@@ -85,8 +85,8 @@ private:
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
   std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
 
-  std::shared_ptr<GMlib::PointLight>                _light;
-  std::shared_ptr<TestTorus>                        _torus;
+//  std::shared_ptr<GMlib::PointLight>                _light;
+//  std::shared_ptr<TestTorus>                        _torus;
 
 signals:
   void                                              signFrameReady();
