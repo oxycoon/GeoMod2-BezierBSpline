@@ -26,6 +26,7 @@ class QOpenGLContext;
 class QOpenGLFramebufferObject;
 class QMouseEvent;
 class QKeyEvent;
+class QWheelEvent;
 
 
 // stl
@@ -69,8 +70,13 @@ public slots:
                                                               const QRectF &new_geometry );
 
 
+
   void                                  mousePressed( const QString& name, QMouseEvent* event );
+  void                                  mouseReleased( const QString& name, QMouseEvent* event );
+  void                                  mouseDoubleClicked( const QString& name, QMouseEvent* event );
   void                                  keyPressed( const QString& name, QKeyEvent* event );
+  void                                  keyReleased( const QString& name, QKeyEvent* event );
+  void                                  wheelEventOccurred( const QString& name, QWheelEvent* event );
 
 protected:
   void                                  timerEvent(QTimerEvent *e);

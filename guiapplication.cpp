@@ -56,7 +56,11 @@ GuiApplication::onSGInit() {
   _window->setSource( QUrl("qrc:/qml/main.qml") );
 
   connect( _window.get(), &Window::signMousePressed, _gmlib.get(), &GMlibWrapper::mousePressed );
+  connect( _window.get(), &Window::signMouseReleased, _gmlib.get(), &GMlibWrapper::mouseReleased );
+  connect( _window.get(), &Window::signMouseDoubleClicked, _gmlib.get(), &GMlibWrapper::mouseDoubleClicked);
   connect( _window.get(), &Window::signKeyPressed, _gmlib.get(), &GMlibWrapper::keyPressed );
+  connect( _window.get(), &Window::signKeyReleased, _gmlib.get(), &GMlibWrapper::keyReleased );
+  connect( _window.get(), &Window::signWheelEventOccurred, _gmlib.get(), &GMlibWrapper::wheelEventOccurred );
 
   // Init test scene of the GMlib wrapper
   _gmlib->initScene();

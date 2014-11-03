@@ -95,37 +95,6 @@ void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& geome
   rc_pair.viewport.changed = true;
 }
 
-void GMlibWrapper::mousePressed(const QString& name, QMouseEvent* event ) {
-
-  const QPointF& pos = event->pos();
-
-  const auto& rc_select = _rc_pairs.at(name.toStdString());
-  const auto& rc_geo = rc_select.viewport.geometry;
-
-  GMlib::Vector<int,2> size(rc_geo.width(),rc_geo.height());
-  _select_renderer->setCamera(rc_select.camera.get());
-
-  GMlib::SceneObject* obj = {nullptr};
-  _glsurface->makeCurrent(); {
-
-    _select_renderer->reshape( size );
-    _select_renderer->select( 0 );
-
-    _select_renderer->prepare();
-
-    obj = _select_renderer->findObject(pos.x(),size(1)-pos.y()-1);
-
-  } _glsurface->doneCurrent();
-
-  if(obj) obj->toggleSelected();
-}
-
-void GMlibWrapper::keyPressed(const QString& name, QKeyEvent* event) {
-  Q_UNUSED(name)
-
-  if( event->key() == Qt::Key_R ) _scene->toggleRun();
-}
-
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
   e->accept();
@@ -344,5 +313,66 @@ GMlibWrapper::getRenderTextureOf(const std::string& name) const {
   if(!_rc_pairs.count(name)) throw std::invalid_argument("[][]Render/Camera pair '" + name + "'  does not exist!");
 
   return _rc_pairs.at(name).render->getFrontRenderTarget();
+}
+
+void
+GMlibWrapper::mousePressed(const QString& name, QMouseEvent* event ) {
+
+  const QPointF& pos = event->pos();
+
+  const auto& rc_select = _rc_pairs.at(name.toStdString());
+  const auto& rc_geo = rc_select.viewport.geometry;
+
+  GMlib::Vector<int,2> size(rc_geo.width(),rc_geo.height());
+  _select_renderer->setCamera(rc_select.camera.get());
+
+  GMlib::SceneObject* obj = {nullptr};
+  _glsurface->makeCurrent(); {
+
+    _select_renderer->reshape( size );
+    _select_renderer->select( 0 );
+
+    _select_renderer->prepare();
+
+    obj = _select_renderer->findObject(pos.x(),size(1)-pos.y()-1);
+
+  } _glsurface->doneCurrent();
+
+  if(obj) obj->toggleSelected();
+}
+
+void GMlibWrapper::mouseReleased(const QString& name, QMouseEvent* event) {
+  Q_UNUSED(name)
+  Q_UNUSED(event)
+
+  qDebug() << "MouseReleased";
+}
+
+void GMlibWrapper::mouseDoubleClicked(const QString& name, QMouseEvent* event) {
+  Q_UNUSED(name)
+  Q_UNUSED(event)
+
+  qDebug() << "MouseDoubleClicked";
+}
+
+void
+GMlibWrapper::keyPressed(const QString& name, QKeyEvent* event) {
+  Q_UNUSED(name)
+
+  if( event->key() == Qt::Key_R ) _scene->toggleRun();
+}
+
+void GMlibWrapper::keyReleased(const QString& name, QKeyEvent* event) {
+  Q_UNUSED(name)
+  Q_UNUSED(event)
+
+  qDebug() << "KeyReleased";
+}
+
+void GMlibWrapper::wheelEventOccurred(const QString& name, QWheelEvent* event) {
+  Q_UNUSED(name)
+  Q_UNUSED(event)
+
+  qDebug() << "WheelEventOccurred";
 }
 
