@@ -3,6 +3,7 @@
 
 
 #include "testtorus.h"
+#include "bezierbspline.h"
 #include "utils.h"
 
 
@@ -295,7 +296,9 @@ void GMlibWrapper::initScene() {
 
 #endif
 
-
+    BezierBSpline<float>* spline;// = new BezierBSpline<float>();
+    GMlib::DMatrix<float> temp;
+    spline->evaluate(temp, 3, 0.7f, 1.0f);
 
 
   } _glsurface->doneCurrent();

@@ -61,6 +61,7 @@ set( HDRS
   window.h
   testtorus.h
   utils.h
+  bezierbspline.h
   )
 
 set( SRCS
@@ -70,6 +71,7 @@ set( SRCS
   guiapplication.cpp
   main.cpp
   window.cpp
+  bezierbspline.cpp
   )
 
 #########
@@ -79,6 +81,7 @@ QT5_WRAP_CPP( HDRS_MOC
   gmlibwrapper.h
   guiapplication.h
   window.h
+  bezierbspline.h
   )
 
 set( RCCS
