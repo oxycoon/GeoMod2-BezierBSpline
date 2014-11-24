@@ -62,6 +62,10 @@ set( HDRS
   testtorus.h
   utils.h
   mbeziersurface.h
+  knotvector.h
+  mysubsurface.h
+  myerbssurf.h
+  mybspline.h
   )
 
 set( SRCS

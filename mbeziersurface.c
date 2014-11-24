@@ -17,6 +17,13 @@ void MBezierSurface<T>::evaluate(GMlib::DMatrix<T> &matrix, int d, T t, T delta)
     eval(matrix, d, t, delta);
 }
 
+/**
+ * @brief MBezierSurface<T>::eval
+ * @param m
+ * @param d
+ * @param t
+ * @param delta
+ */
 template<typename T>
 inline
 void MBezierSurface<T>::eval(GMlib::DMatrix<T> &m, int d, T t, T delta)
@@ -31,14 +38,17 @@ void MBezierSurface<T>::eval(GMlib::DMatrix<T> &m, int d, T t, T delta)
         m[0][0] = 1;
         return;
     }
+    //Other wise set teh dimension
     else
     {
         m.setDim(dim, dim);
     }
 
+    //Sets the first values in the matrix.
     m[d-1][0] = 1-t;
     m[d-1][1] = t;
 
+    //Calculates the top half of the matrix
     for(int i = d -2; i >= 0; i--)
     {
        m[i][0] = (1-t) * m[i+1][0];
@@ -56,6 +66,7 @@ void MBezierSurface<T>::eval(GMlib::DMatrix<T> &m, int d, T t, T delta)
 
     m[d][0] = -delta;
     m[d][1] = delta;
+    //Calculates the bottom half of the matrix.
     for(int k = 2; k <= d; k++)
     {
         for(int i = d; i > d-k; i--)
@@ -67,16 +78,13 @@ void MBezierSurface<T>::eval(GMlib::DMatrix<T> &m, int d, T t, T delta)
             }
             m[i][0] = - k * m[i][0];
         }
-
-        std::cout << std::endl;
-        std::cout << m << std::endl;
     }
 
 
 //    std::cout << std::endl;
 //    std::cout << m << std::endl;
 
-   T verifier;
+    T verifier;
     for(int i = 0; i <= d; i++)
     {
         for(int j = 0; j <= d; j++)
