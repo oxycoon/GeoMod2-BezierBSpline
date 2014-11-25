@@ -3,9 +3,15 @@
 
 
 #include "testtorus.h"
-#include "mbeziersurface.h"
 #include "utils.h"
 
+
+
+//DANIEL
+#include "mbeziersurface.h"
+#include "mybspline.h"
+#include "myerbssurf.h"
+#include "mysubsurface.h"
 
 // GMlib
 #include <gmOpenglModule>
@@ -286,19 +292,36 @@ void GMlibWrapper::initScene() {
     auto surface_visualizer = new GMlib::PSurfPointsVisualizer<float,3>;
 
     // Surface
-    auto surface = new TestTorus;
+/*    auto surface = new TestTorus;
 //    surface->toggleDefaultVisualizer();
     surface->insertVisualizer(surface_visualizer);
     surface->replot(200,200,1,1);
     _scene->insert(surface);
 
-    surface->test01();
+    surface->test01();*/
 
 #endif
 
-    MBezierSurface<float>* spline = new MBezierSurface<float>();// = new BezierBSpline<float>();
-    GMlib::DMatrix<float> temp;
-    spline->evaluate(temp, 3, 0.3f, 1.0f);
+    GMlib::DMatrix<GMlib::Vector<float,3> > temp;
+    temp.setDim(3,3);
+    temp[0][0] = GMlib::Vector<float,3>(0,0,0);
+    temp[1][0] = GMlib::Vector<float,3>(1,0,0);
+    temp[2][0] = GMlib::Vector<float,3>(2,0,0);
+    temp[0][1] = GMlib::Vector<float,3>(0,1,0);
+    temp[1][1] = GMlib::Vector<float,3>(1,1,1);
+    temp[2][1] = GMlib::Vector<float,3>(2,1,0);
+    temp[0][2] = GMlib::Vector<float,3>(0,2,0);
+    temp[1][2] = GMlib::Vector<float,3>(1,2,0);
+    temp[2][2] = GMlib::Vector<float,3>(2,2,0);
+
+    MBezierSurface<float>* spline = new MBezierSurface<float>(temp);// = new BezierBSpline<float>();
+    //
+    //spline->evaluate(temp, 3, 0.3f, 1.0f);
+    //spline->insertVisualizer(surface_visualizer);
+    spline->toggleDefaultVisualizer();
+    spline->replot(20,20,1,1);
+
+    _scene->insert(spline);
 
 
   } _glsurface->doneCurrent();

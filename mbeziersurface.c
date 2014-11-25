@@ -12,21 +12,58 @@ MBezierSurface<T>::MBezierSurface()
 
 template<typename T>
 inline
-void MBezierSurface<T>::evaluate(GMlib::DMatrix<T> &matrix, int d, T t, T delta)
+MBezierSurface<T>::MBezierSurface(GMlib::DMatrix<GMlib::Vector<T,3> > c)
 {
-    eval(matrix, d, t, delta);
+    _c = c;
+}
+
+template<typename T>
+void MBezierSurface<T>::eval(T u, T v, int d1, int d2, bool, bool)
+{
+    this->_p.setDim(d1 + 1, d2 + 1);
+
+    GMlib::DMatrix<T> b1;
+    GMlib::DMatrix<T> b2;
+
+    computeBMatrix(b1, d1, u);
+    computeBMatrix(b2, d2, v);
+
+    this->_p = (b1 * _c) ^ b2.transpose();
+}
+
+template<typename T>
+T MBezierSurface<T>::getStartPU()
+{
+    return 0;
+}
+
+template<typename T>
+T MBezierSurface<T>::getStartPV()
+{
+    return 0;
+}
+
+template<typename T>
+T MBezierSurface<T>::getEndPU()
+{
+    return 1;
+}
+
+template<typename T>
+T MBezierSurface<T>::getEndPV()
+{
+    return 1;
 }
 
 /**
- * @brief MBezierSurface<T>::eval
+ * @brief MBezierSurface<T>::computeBMatrix
  * @param m
  * @param d
  * @param t
  * @param delta
  */
 template<typename T>
-inline
-void MBezierSurface<T>::eval(GMlib::DMatrix<T> &m, int d, T t, T delta)
+void MBezierSurface<T>::computeBMatrix(GMlib::DMatrix<T> &m, int d, T t, T delta)
 {
     int dim = d + 1;
 
@@ -38,7 +75,7 @@ void MBezierSurface<T>::eval(GMlib::DMatrix<T> &m, int d, T t, T delta)
         m[0][0] = 1;
         return;
     }
-    //Other wise set teh dimension
+    //Other wise set the dimension
     else
     {
         m.setDim(dim, dim);
@@ -79,21 +116,4 @@ void MBezierSurface<T>::eval(GMlib::DMatrix<T> &m, int d, T t, T delta)
             m[i][0] = - k * m[i][0];
         }
     }
-
-
-//    std::cout << std::endl;
-//    std::cout << m << std::endl;
-
-    T verifier;
-    for(int i = 0; i <= d; i++)
-    {
-        for(int j = 0; j <= d; j++)
-        {
-            verifier += m[i][j];
-        }
-        std::cout << "Verifying line #" << i << " before derivatives: " << verifier << std::endl;
-        verifier = 0;
-    }
-
-
 }

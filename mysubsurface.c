@@ -42,7 +42,7 @@ MySubSurface<T>::MySubSurface(const MySubSurface &copy)
  */
 template <typename T>
 inline
-MySubSurface<T>::MySubSurface(GMlib::PSurf<T, _Tp2> *c, T startU, T endU, T startV, T endV, T u, T v, bool closedU, bool closedV)
+MySubSurface<T>::MySubSurface(GMlib::PSurf<T,3> *c, T startU, T endU, T startV, T endV, T u, T v, bool closedU, bool closedV)
 {
     set(c, startU, endU, startV, endV, u, v, closedU, closedV);
     GMlib::DMatrix<GMlib::Vector<T,3>> temp = _c->evaluateParent(u, v, 0, 0);
@@ -80,7 +80,7 @@ bool MySubSurface<T>::isClosedV() const
 //--------------------------------------------------
 template <typename T>
 inline
-bool MySubSurface<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
+void MySubSurface<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
 {
     this->_p = _c->evaluateParent(u, v, d1, d2);
     this->_p[0][0] -= _translation;
@@ -104,7 +104,7 @@ bool MySubSurface<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
  */
 template <typename T>
 inline
-void MySubSurface<T>::set(GMlib::PSurf<T, _Tp2> *c, T startU, T endU, T startV, T endV, T u, T v, bool closedU, bool closedV)
+void MySubSurface<T>::set(GMlib::PSurf<T,3> *c, T startU, T endU, T startV, T endV, T u, T v, bool closedU, bool closedV)
 {
     _c = c;
     _startU = startU;

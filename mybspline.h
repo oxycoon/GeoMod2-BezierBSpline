@@ -3,7 +3,8 @@
 
 #include <parametrics/gmpsurf>
 
-class MyBSpline
+template<typename T>
+class MyBSpline : public GMlib::PSurf<T,3>
 {
 public:
     MyBSpline();
@@ -15,11 +16,17 @@ public:
 protected:
 
     void init(){}
-    void eval(GMlib::DMatrix<T> &matrix, int d, T t, T delta = 1);
+    virtual void eval(GMlib::DMatrix<T> &matrix, int d, T t, T delta = 1);
 
 
 private:
-    int _d;
+    GMlib::DMatrix<GMlib::PSurf<T,3>*> _c;
+
+    GMlib::DVector<T> _u;
+    GMlib::DVector<T> _v;
+
+    bool isClosedU;
+    bool isClosedV;
 };
 
 
