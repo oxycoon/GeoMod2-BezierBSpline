@@ -3,6 +3,8 @@
 
 #include <parametrics/gmpsurf>
 
+#include "knotvector.h"
+
 template<typename T>
 class MyBSpline : public GMlib::PSurf<T,3>
 {
@@ -11,12 +13,12 @@ public:
 
     ~MyBSpline(){}
 
-    void evaluate(GMlib::DMatrix<T> &matrix, int d, T t, T delta);
+
 
 protected:
 
     void init(){}
-    virtual void eval(GMlib::DMatrix<T> &matrix, int d, T t, T delta = 1);
+    void eval(T u, T v, int d1, int d2, bool lu, bool lv);
 
 
 private:
@@ -27,6 +29,10 @@ private:
 
     bool isClosedU;
     bool isClosedV;
+
+    void computeBMatrix(GMlib::DMatrix<T> &matrix, int d, T t, T delta);
+
+    int findKnotIndex(T t, const KnotVector<T> &vector, bool closed);
 };
 
 

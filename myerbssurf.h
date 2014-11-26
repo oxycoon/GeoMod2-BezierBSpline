@@ -2,7 +2,11 @@
 #define MYERBSSURF_H
 
 #include <gmParametricsModule>
+
+#include <parametrics/evaluators/gmerbsevaluator.h>
+
 #include "knotvector.h"
+#include "mysubsurface.h"
 
 enum LocalSurfaceType{SUBSURFACE, BEZIERSURFACE};
 
@@ -11,19 +15,11 @@ class MyERBSSurf : public GMlib::PSurf<T, 3>
 {
 public:
     MyERBSSurf();
-    MyERBSSurf(GMlib::PSurf<T,3> &original);
-    ~MyERBSSurf(){}
+    MyERBSSurf(GMlib::PSurf<T,3> *original);
+    ~MyERBSSurf();
 
 protected:
-    GMlib::PSurf<T,3>* _surface;
-    GMlib::ERBSEvaluator<T> _evaluator;
 
-    KnotVector<T> _u;
-    KnotVector<T> _v;
-    LocalSurfaceType _localSurfaceType;
-
-    int _bezierDegree1;
-    int _bezierDegree2;
 
     T getStartPU();
     T getStartPV();
@@ -33,13 +29,28 @@ protected:
     void localSimulate(double dt);
     void eval(T u, T v, int d1, int d2, bool lu, bool lv);
     void makeKnotVector(KnotVector<T> &vector, int samples, int dim, bool closed, T start, T end);
+    void makeBVector(GMlib::DVector<T> &bVector, const KnotVector<T> &k, int knotIndex, T t, int d);
 
-    int findKnotIndex(T t, const KnotVector<T> &theVector, bool closed);
+    int findKnotIndex(T t, const KnotVector<T> &vector, bool closed);
 
     T mapKnot(T k, T start, T end);
+    GMlib::DMatrix<GMlib::Vector<T,3> > makeCMatrix(T u, T v, int uIndex, int vIndex, T ud, T uV);
 
 
 private:
+    GMlib::PSurf<T,3>* _surface;
+    GMlib::ERBSEvaluator<double> _evaluator;
+    GMlib::DMatrix<GMlib::Vector<T,3> > _c;
+
+    KnotVector<T> _u;
+    KnotVector<T> _v;
+    LocalSurfaceType _localSurfaceType;
+
+    int _bezierDegree1;
+    int _bezierDegree2;
+
+
+
     void createSubSurfaces(GMlib::PSurf<T,3>* surf, int countU, int countV, bool closedU, bool closedV);
 
 };

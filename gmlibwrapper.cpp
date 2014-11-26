@@ -292,7 +292,7 @@ void GMlibWrapper::initScene() {
     auto surface_visualizer = new GMlib::PSurfPointsVisualizer<float,3>;
 
     // Surface
-/*    auto surface = new TestTorus;
+    /*auto surface = new TestTorus;
 //    surface->toggleDefaultVisualizer();
     surface->insertVisualizer(surface_visualizer);
     surface->replot(200,200,1,1);

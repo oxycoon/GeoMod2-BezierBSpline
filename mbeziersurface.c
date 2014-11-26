@@ -28,7 +28,7 @@ void MBezierSurface<T>::eval(T u, T v, int d1, int d2, bool, bool)
     computeBMatrix(b1, d1, u);
     computeBMatrix(b2, d2, v);
 
-    this->_p = (b1 * _c) ^ b2.transpose();
+    this->_p = (b1.invert() * _c) ^ b2.invert().transpose();
 }
 
 template<typename T>
@@ -57,10 +57,12 @@ T MBezierSurface<T>::getEndPV()
 
 /**
  * @brief MBezierSurface<T>::computeBMatrix
- * @param m
- * @param d
+ * @param m Matrix which is being computed
+ * @param d order
  * @param t
  * @param delta
+ *
+ *  Computes the basis matrix for given matrix and values
  */
 template<typename T>
 void MBezierSurface<T>::computeBMatrix(GMlib::DMatrix<T> &m, int d, T t, T delta)
