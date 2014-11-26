@@ -117,7 +117,7 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
     //GET LOCAL SURFACES
     // s, su, sv = evaluate(u,v,1,1)
 
-    //_surface->evaluateParent(u, v, 1, 1);
+    s =_surface->evaluateParent(u, v, 1, 1);
 
 
     this->_p[0][0] = bv * s ^ bu;
