@@ -12,11 +12,31 @@ MyERBSSurf<T>::MyERBSSurf()
 {
 }
 
+/**
+ * @brief MyERBSSurf<T>::MyERBSSurf
+ * @param original Original surface to turn into ERBSSurface
+ * @param sampleU
+ * @param sampleV
+ * @param dim1
+ * @param dim2
+ */
 template<typename T>
 inline
-MyERBSSurf<T>::MyERBSSurf(GMlib::PSurf<T, 3> *original)
+MyERBSSurf<T>::MyERBSSurf(GMlib::PSurf<T, 3> *original, int sampleU, int sampleV, int dim1, int dim2)
 {
     _surface = original;
+
+    _bezierDegree1 = dim1;
+    _bezierDegree2 = dim2;
+
+    if(_surface->isClosedU())
+        sampleU++;
+    if(_surface->isClosedV())
+        sampleV++;
+
+    makeKnotVector(_u, sampleU, 1, _surface->isClosedU(), _surface->getParStartU(), _surface->getParEndU());
+    makeKnotVector(_v, sampleU, 1, _surface->isClosedV(), _surface->getParStartV(), _surface->getParEndV());
+    createSubSurfaces(_surface, sampleU, sampleV, _surface->isClosedU(), _surface->isClosedV());
 }
 
 template<typename T>
@@ -70,10 +90,12 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
     int indexU = findKnotIndex(u, _u, lu);
     int indexV = findKnotIndex(v, _v, lv);
 
-    T b1, b1d;
-    T b2, b2d;
+    GMlib::DVector<T> b1, b2;
 
-    _evaluator.set(_u[indexU], _u[indexU+1] - _u[indexU] );
+    makeBVector(b1, _u, indexU, u, d1);
+    makeBVector(b2, _v, indexV, v, d2);
+
+    /*_evaluator.set(_u[indexU], _u[indexU+1] - _u[indexU] );
     b1 = _evaluator(u);
     b1d = _evaluator.getDer1();
     //USE FOR U
@@ -81,21 +103,21 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
     _evaluator.set(_v[indexV], _v[indexV+1] - _v[indexV] );
     b2 = _evaluator(u);
     b2d = _evaluator.getDer1();
-    //USE FOR V
+    //USE FOR V*/
 
     GMlib::DVector<T> bu, bv, bud, bvd;
     bu.setDim(2); bv.setDim(2); bud.setDim(2); bvd.setDim(2);
-    bu[0] = b1; bu[1] = 1-b1d;
-    bv[0] = b2; bu[1] = 1-b2d;
-    bud[0] = -b1d; bud[1] = b1d;
-    bvd[0] = -b2d; bvd[1] = b2d;
+    bu[0] = b1[0]; bu[1] = 1-b1[0];
+    bv[0] = b2[0]; bu[1] = 1-b2[0];
+    bud[0] = -b1[1]; bud[1] = b1[1];
+    bvd[0] = -b2[1]; bvd[1] = b2[1];
 
     GMlib::DMatrix<GMlib::Vector<T,3>> s, su, sv;
 
     //GET LOCAL SURFACES
     // s, su, sv = evaluate(u,v,1,1)
 
-    _surface->evaluate(u, v, 1, 1);
+    //_surface->evaluateParent(u, v, 1, 1);
 
 
     this->_p[0][0] = bv * s ^ bu;
@@ -166,9 +188,12 @@ inline
  * @param k Knot vector to use
  * @param knotIndex Index of the item
  * @param t
- * @param d
+ * @param d dimension
  *
  *  Create B vector for the given knot at given index.
+ *      [0] - Value
+ *      [1] - 1st derivative
+ *      [2] - 2nd derivative
  */
 void MyERBSSurf<T>::makeBVector(GMlib::DVector<T> &bVector, const KnotVector<T> &k, int knotIndex, T t, int d)
 {
@@ -240,6 +265,39 @@ T MyERBSSurf<T>::mapKnot(T k, T start, T end)
     {
         return (k-start)/(end-start);
     }
+}
+
+template <typename T>
+GMlib::DMatrix<GMlib::Vector<T, 3> > MyERBSSurf<T>::makeCMatrix(T u, T v, int uIndex, int vIndex, int d1, int d2)
+{
+    //TODO: Create for bezier, this is just for sub surface
+    GMlib::DMatrix<GMlib::Vector<T,3> > temp;
+    GMlib::DMatrix<GMlib::Vector<T,3> > result;
+
+    temp = _c[uIndex-1][vIndex-1]->evaluateParent(u, v, d1, d2);
+    result = _c[uIndex][vIndex-1]->evaluateParent(u, v, d1, d2);
+
+    GMlib::DVector<double> a, b;
+    a.setDim(d1+1);
+
+    makeBVector(b, _u, uIndex, u, d1);
+
+    temp -= result;
+
+    for(int i = 0; i <= d1; i++)
+    {
+        a[i] = 1;
+        for(int j = i-1; j > 0; j--)
+        {
+            a[j] += a[j-1];
+        }
+
+        for(int j = 0; j <= i; j++)
+        {
+            result[i] = (a[j] * b[j]) * temp[i-j];
+        }
+    }
+    return result;
 }
 
 /**

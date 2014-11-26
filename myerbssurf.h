@@ -15,7 +15,7 @@ class MyERBSSurf : public GMlib::PSurf<T, 3>
 {
 public:
     MyERBSSurf();
-    MyERBSSurf(GMlib::PSurf<T,3> *original);
+    MyERBSSurf(GMlib::PSurf<T,3> *original, int sampleU, int sampleV, int dim1, int dim2);
     ~MyERBSSurf();
 
 protected:
@@ -34,13 +34,13 @@ protected:
     int findKnotIndex(T t, const KnotVector<T> &vector, bool closed);
 
     T mapKnot(T k, T start, T end);
-    GMlib::DMatrix<GMlib::Vector<T,3> > makeCMatrix(T u, T v, int uIndex, int vIndex, T ud, T uV);
+    GMlib::DMatrix<GMlib::Vector<T,3> > makeCMatrix(T u, T v, int uIndex, int vIndex, int d1, int d2);
 
 
 private:
     GMlib::PSurf<T,3>* _surface;
     GMlib::ERBSEvaluator<double> _evaluator;
-    GMlib::DMatrix<GMlib::Vector<T,3> > _c;
+    GMlib::DMatrix<GMlib::PSurf<T,3>* > _c;
 
     KnotVector<T> _u;
     KnotVector<T> _v;
