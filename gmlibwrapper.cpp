@@ -292,17 +292,17 @@ void GMlibWrapper::initScene() {
     auto surface_visualizer = new GMlib::PSurfPointsVisualizer<float,3>;
 
     // Surface
-    /*auto surface = new TestTorus;
+    auto surface = new TestTorus;
 //    surface->toggleDefaultVisualizer();
     surface->insertVisualizer(surface_visualizer);
     surface->replot(200,200,1,1);
-    _scene->insert(surface);
+    //_scene->insert(surface);
 
-    surface->test01();*/
+    surface->test01();
 
 #endif
 
-    GMlib::DMatrix<GMlib::Vector<float,3> > temp;
+    /*GMlib::DMatrix<GMlib::Vector<float,3> > temp;
     temp.setDim(3,3);
     temp[0][0] = GMlib::Vector<float,3>(0,0,0);
     temp[1][0] = GMlib::Vector<float,3>(1,0,0);
@@ -321,8 +321,12 @@ void GMlibWrapper::initScene() {
     spline->toggleDefaultVisualizer();
     spline->replot(20,20,1,1);
 
-    _scene->insert(spline);
+    _scene->insert(spline);*/
 
+    MyERBSSurf<float>* myErbs = new MyERBSSurf<float>(surface, 4, 4, 1, 1) ;
+    myErbs->toggleDefaultVisualizer();
+    myErbs->replot(20, 20, 1, 1);
+    _scene->insert(myErbs);
 
   } _glsurface->doneCurrent();
 }
@@ -340,6 +344,7 @@ GMlibWrapper::getRenderTextureOf(const std::string& name) const {
 
   return _rc_pairs.at(name).render->getFrontRenderTarget();
 }
+
 
 void
 GMlibWrapper::mousePressed(const QString& name, QMouseEvent* event ) {
@@ -419,6 +424,346 @@ void GMlibWrapper::wheelEventOccurred(const QString& name, QWheelEvent* event) {
     camera->move( delta*scale / camera_geo.height());
 
   }
-
 }
+/*
+
+void
+GMlibWrapper::mousePressed(const QString& name, QMouseEvent* event ) {
+
+
+    const QPointF& pos = event->pos();
+
+    _currentMousePos = _prevMousePos = GMlib::Point<int,2>(pos.x(),pos.y());
+
+    const auto& rc_select = _rc_pairs.at(name.toStdString());
+    const auto& rc_geo = rc_select.viewport.geometry;
+
+    if(!_moveObjectButtonPressed && event->button() == Qt::RightButton)
+    {
+        GMlib::Vector<int,2> size(rc_geo.width(),rc_geo.height());
+        _select_renderer->setCamera(rc_select.camera.get());
+
+        GMlib::SceneObject* obj = {nullptr};
+        _glsurface->makeCurrent(); {
+
+            qDebug() << "Checking selecting" << size;
+
+            _select_renderer->reshape( size );
+            _select_renderer->select( 0 );
+
+            _select_renderer->prepare();
+
+            obj = _select_renderer->findObject(pos.x(),size(1)-pos.y()-1);
+
+        } _glsurface->doneCurrent();
+
+        if(obj) {
+            if(!_selectMultipleObjectsPressed){
+                const GMlib::Array<GMlib::SceneObject*> &sel_objs = getScene()->getSelectedObjects();
+                for( int i = 0; i < sel_objs.getSize(); i++ ) {
+                    if(sel_objs(i) != obj)
+                        sel_objs(i)->setSelected(false);
+                }
+            }
+            obj->toggleSelected();
+            qDebug() << "Found object" << obj->isSelected();
+        }
+        else    { qDebug() << "Object not found in scene"; };
+    }
+
+    qDebug() << getScene()->getSelectedObjects().getSize();
+}
+
+void GMlibWrapper::mouseReleased(const QString& name, QMouseEvent* event) {
+    Q_UNUSED(name)
+    Q_UNUSED(event)
+
+    qDebug() << "MouseReleased";
+}
+
+void GMlibWrapper::mouseDoubleClicked(const QString& name, QMouseEvent* event) {
+    Q_UNUSED(name)
+    Q_UNUSED(event)
+
+    qDebug() << "MouseDoubleClicked";
+}
+
+void GMlibWrapper::mouseMoved(const QString &name, QMouseEvent *event)
+{
+    Q_UNUSED(name);
+    Q_UNUSED(event);
+    const QPointF& pos = event->pos();
+
+    _currentMousePos = GMlib::Point<int,2>(pos.x(), pos.y());
+    if(_prevMousePos.getLength() <= 0.0f)
+        _prevMousePos = _currentMousePos;
+
+    auto& rc = _rc_pairs.at(name.toStdString());
+    auto cam    = rc.camera.get();
+    float SNAP = 0.01f;
+
+
+    qDebug() << "Mouse Moved";
+    if(_moveObjectButtonPressed)
+    {
+        _glsurface->makeCurrent();
+        const GMlib::Array<GMlib::SceneObject*> &sel_objs = getScene()->getSelectedObjects();
+        for( int i = 0; i < sel_objs.getSize(); i++ ) {
+
+            GMlib::SceneObject* obj = sel_objs(i);
+
+            if( obj ) {
+
+                const double dh = cam->deltaTranslate( obj );
+                const GMlib::Vector<float,3> deltav(
+                            ( ( _prevMousePos(0) - _currentMousePos(0) ) * dh ) * cam->getSide() +
+                            ( ( _prevMousePos(1) - _currentMousePos(1) ) * dh ) * cam->getUp() );
+
+                if( deltav.getLength() > SNAP && deltav.getLength() < 1000.0 ) {
+
+                    if( obj->getTypeId() != GMlib::GM_SO_TYPE_SELECTOR )
+                        obj->translateGlobal( deltav );
+                    else if( obj->getTypeId()== GMlib::GM_SO_TYPE_SELECTOR )
+                        obj->editPos(deltav);
+
+                }
+            }
+        }
+        _glsurface->doneCurrent();
+    }
+
+    if(!_moveObjectButtonPressed && !_rotateObjectButtonPressed)
+    {
+        const float scale = 5.0f;
+        const GMlib::Vector<float,2> delta (
+                    (_currentMousePos(0) - _prevMousePos(0)) * scale / cam->getViewportW(),
+                    (_prevMousePos(1) - _currentMousePos(1)) * scale / cam->getViewportH()
+                    );
+        cam->move( delta );
+    }
+
+    if(_rotateObjectButtonPressed)
+    {
+        _glsurface->makeCurrent();
+
+        const GMlib::Vector<int,2> pos = _currentMousePos;
+        const GMlib::Vector<int,2> prev = _prevMousePos;
+        const GMlib::Array<GMlib::SceneObject*> &objs = getScene()->getSelectedObjects();
+
+        // Compute rotation axis and angle in respect to the camera and view.
+        const GMlib::UnitVector<float,3> rot_v =
+                float( pos(0) - prev(0) ) * cam->getUp() -
+                float( pos(1) - prev(1) ) * cam->getSide();
+        const GMlib::Angle ang(
+                    M_2PI * sqrt(
+                        pow( double( pos(0) - prev(0) ) / cam->getViewportW(), 2 ) +
+                        pow( double( prev(1) - pos(1) ) / cam->getViewportH(), 2 ) ) );
+
+        int no_objs = 0;
+        GMlib::Sphere<float,3> sphere;
+        for( int i = 0; i < objs.getSize(); ++i )
+            if( objs(i)->getTypeId() != GMlib::GM_SO_TYPE_SELECTOR ) {
+                sphere += objs(i)->getSurroundingSphereClean();
+                no_objs++;
+            }
+
+        for( int i = 0; i < objs.getSize(); ++i )
+            if( objs(i)->getTypeId() != GMlib::GM_SO_TYPE_SELECTOR )
+                if( std::abs(pos(0)-prev(0)) > POS_TOLERANCE || std::abs(pos(1)-prev(1)) > POS_TOLERANCE )
+                    no_objs > 1 ? objs(i)->rotate( ang, sphere.getPos(), rot_v) : objs(i)->rotate( ang, rot_v);
+
+        _glsurface->doneCurrent();
+    }
+
+
+    _prevMousePos = _currentMousePos;
+}
+
+void
+GMlibWrapper::keyPressed(const QString& name, QKeyEvent* event) {
+    Q_UNUSED(name)
+
+    if( event->key() == Qt::Key_R ) _scene->toggleRun();
+
+    if( event->key() == Qt::Key_E )
+    {
+        qDebug() << "Trying to show locals for selected object";
+
+        _glsurface->makeCurrent();
+
+        const GMlib::Array<GMlib::SceneObject*> &sel_objs = getScene()->getSelectedObjects();
+        for( int i = 0; i < sel_objs.getSize(); i++ ) {
+
+            GMlib::SceneObject *sel_obj = sel_objs(i);
+
+            // ERBS
+            MyERBSSurf *esObj = dynamic_cast<MyERBSSurf*>( sel_obj );
+
+            // Hermite
+            GMlib::HermiteSurfP2V2 *hs22Obj = dynamic_cast<GMlib::HermiteSurfP2V2*>(sel_obj);
+            GMlib::HermiteSurfP3V2 *hs32Obj = dynamic_cast<GMlib::HermiteSurfP3V2*>(sel_obj);
+            GMlib::HermiteSurfP3V3 *hs33Obj = dynamic_cast<GMlib::HermiteSurfP3V3*>(sel_obj);
+
+            // Bezier
+            GMlib::PBezierSurf<float> *bsObj = dynamic_cast<GMlib::PBezierSurf<float>*>( sel_obj );
+
+
+            if( esObj ) {
+
+                if( esObj->isLocalPatchesVisible() )
+                    esObj->hideLocalPatches();
+                else
+                    esObj->showLocalPatches();
+
+            }
+            else if( bsObj ) {
+
+                Erbssurface *parent = dynamic_cast<Erbssurface*>( bsObj->getParent());
+                if( parent ) {
+
+                    if( bsObj->toggleCollapsed() )
+                        bsObj->hideSelectors();
+                    else
+                        bsObj->showSelectors(true);
+                }
+                else {
+
+                    if( bsObj->isSelectorsVisible() )
+                        bsObj->hideSelectors();
+                    else
+                        bsObj->showSelectors(true);
+                }
+
+            }
+            else if(hs22Obj)
+            {
+                hs22Obj->showLocals();
+            }
+            else if(hs32Obj)
+            {
+                hs32Obj->showLocals();
+            }
+            else if(hs33Obj)
+            {
+                hs33Obj->showLocals();
+            }
+        }
+        _glsurface->doneCurrent();
+    }
+
+    if(event->key() == Qt::Key_Shift)
+    {
+        _moveObjectButtonPressed = true;
+    }
+
+    if(event->key() == Qt::Key_Control)
+    {
+        _rotateObjectButtonPressed = true;
+    }
+
+    if(event->key() == Qt::Key_Alt)
+    {
+        _selectMultipleObjectsPressed = true;
+    }
+
+    if(event->key() == Qt::Key_W)
+    {
+        _glsurface->makeCurrent();
+
+        const GMlib::Array<GMlib::SceneObject*> &sel_objs = getScene()->getSelectedObjects();
+        for( int i = 0; i < sel_objs.getSize(); i++ ) {
+
+            GMlib::SceneObject *sel_obj = sel_objs(i);
+
+            // ERBS
+            Erbssurface *esObj = dynamic_cast<Erbssurface*>( sel_obj );
+
+            if( esObj ) {
+
+                esObj->toggleDisplayMode();
+                esObj->replot();
+            }
+        }
+        _glsurface->doneCurrent();
+    }
+
+    if(event->key() == Qt::Key_P)
+    {
+        _glsurface->makeCurrent();
+
+        const GMlib::Array<GMlib::SceneObject*> &sel_objs = getScene()->getSelectedObjects();
+        for( int i = 0; i < sel_objs.getSize(); i++ ) {
+
+            GMlib::SceneObject *sel_obj = sel_objs(i);
+
+            // ERBS
+            Erbssurface *esObj = dynamic_cast<Erbssurface*>( sel_obj );
+            GMlib::HermiteSurfP2V2 * hs22Obj = dynamic_cast<GMlib::HermiteSurfP2V2*>(sel_obj);
+            GMlib::HermiteSurfP3V2 * hs32Obj = dynamic_cast<GMlib::HermiteSurfP3V2*>(sel_obj);
+            GMlib::HermiteSurfP3V3 * hs33Obj = dynamic_cast<GMlib::HermiteSurfP3V3*>(sel_obj);
+            GMlib::PCylinder<float> * cylObj = dynamic_cast<GMlib::PCylinder<float>*>(sel_obj);
+
+            _replotLowMediumHigh += 2;
+
+            if(_replotLowMediumHigh>5)
+                _replotLowMediumHigh = 1;
+
+            if( esObj )
+                esObj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
+
+            if(hs22Obj)
+                hs22Obj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
+
+            if(hs32Obj)
+                hs32Obj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
+
+            if(hs33Obj)
+                hs33Obj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
+
+            if(cylObj)
+                cylObj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
+
+        }
+        _glsurface->doneCurrent();
+    }
+}
+
+void GMlibWrapper::keyReleased(const QString& name, QKeyEvent* event) {
+    Q_UNUSED(name)
+
+    qDebug() << "KeyReleased";
+
+    if(event->key() == Qt::Key_Shift)
+        _moveObjectButtonPressed = false;
+    if(event->key() == Qt::Key_Control)
+        _rotateObjectButtonPressed = false;
+    if(event->key() == Qt::Key_Alt)
+        _selectMultipleObjectsPressed = false;
+}
+
+void GMlibWrapper::wheelEventOccurred(const QString& name, QWheelEvent* event) {
+
+    int delta = event->delta();
+    auto& rc = _rc_pairs.at(name.toStdString());
+
+    const auto& camera_geo = rc.viewport.geometry;
+    auto camera    = rc.camera.get();
+    auto isocamera = dynamic_cast<GMlib::IsoCamera*>(camera);
+    if(isocamera) {
+
+        if( delta < 0 ) isocamera->zoom( 1.05 );
+        if( delta > 0 ) isocamera->zoom( 0.95 );
+    }
+    else if(camera) {
+
+        double scale;
+        if( camera->isLocked() )
+            scale = camera->getLockDist();
+        else
+            scale = getScene()->getSphere().getRadius();
+
+        camera->move( delta*scale / camera_geo.height());
+
+    }
+}*/
 

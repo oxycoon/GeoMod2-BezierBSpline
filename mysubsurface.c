@@ -50,6 +50,12 @@ MySubSurface<T>::MySubSurface(GMlib::PSurf<T,3> *c, T startU, T endU, T startV, 
     this->translate(_translation);
 }
 
+template <typename T>
+MySubSurface<T>::~MySubSurface()
+{
+    //delete _c;
+}
+
 //--------------------------------------------------
 //      PUBLIC GET/SET
 //--------------------------------------------------
@@ -84,6 +90,34 @@ void MySubSurface<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
 {
     this->_p = _c->evaluateParent(u, v, d1, d2);
     this->_p[0][0] -= _translation;
+}
+
+template <typename T>
+inline
+T MySubSurface<T>::getStartPU()
+{
+    return _startU;
+}
+
+template <typename T>
+inline
+T MySubSurface<T>::getStartPV()
+{
+    return _startV;
+}
+
+template <typename T>
+inline
+T MySubSurface<T>::getEndPU()
+{
+    return _endU;
+}
+
+template <typename T>
+inline
+T MySubSurface<T>::getEndPV()
+{
+    return _endV;
 }
 
 //--------------------------------------------------

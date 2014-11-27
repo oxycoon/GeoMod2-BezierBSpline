@@ -13,6 +13,8 @@ enum LocalSurfaceType{SUBSURFACE, BEZIERSURFACE};
 template <typename T>
 class MyERBSSurf : public GMlib::PSurf<T, 3>
 {
+    GM_SCENEOBJECT(MyERBSSurf)
+
 public:
     MyERBSSurf();
     MyERBSSurf(GMlib::PSurf<T,3> *original, int sampleU, int sampleV, int dim1, int dim2);

@@ -76,6 +76,7 @@ public slots:
   void                                  keyReleased( const QString& name, QKeyEvent* event );
   void                                  wheelEventOccurred( const QString& name, QWheelEvent* event );
 
+  //void                                  mouseMoved(const QString &name, QMouseEvent *event);
 protected:
   void                                  timerEvent(QTimerEvent *e);
 

@@ -6,6 +6,7 @@
 template<typename T>
 class MySubSurface: public GMlib::PSurf<T,3>
 {
+    GM_SCENEOBJECT(MySubSurface)
 public:
     MySubSurface();
     MySubSurface(const MySubSurface &copy);
@@ -29,6 +30,12 @@ protected:
     T _v;
 
     void eval(T u, T v, int d1, int d2, bool lu, bool lv);
+
+    T getStartPU();
+    T getStartPV();
+    T getEndPU();
+    T getEndPV();
+
 
 private:
     void set(GMlib::PSurf<T,3>* c, T startU, T endU, T startV, T endV, T u, T v, bool closedU, bool closedV);

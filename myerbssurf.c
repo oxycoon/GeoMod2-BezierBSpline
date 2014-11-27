@@ -35,7 +35,7 @@ MyERBSSurf<T>::MyERBSSurf(GMlib::PSurf<T, 3> *original, int sampleU, int sampleV
         sampleV++;
 
     makeKnotVector(_u, sampleU, 1, _surface->isClosedU(), _surface->getParStartU(), _surface->getParEndU());
-    makeKnotVector(_v, sampleU, 1, _surface->isClosedV(), _surface->getParStartV(), _surface->getParEndV());
+    makeKnotVector(_v, sampleV, 1, _surface->isClosedV(), _surface->getParStartV(), _surface->getParEndV());
     createSubSurfaces(_surface, sampleU, sampleV, _surface->isClosedU(), _surface->isClosedV());
 }
 
@@ -112,17 +112,29 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
     bud[0] = -b1[1]; bud[1] = b1[1];
     bvd[0] = -b2[1]; bvd[1] = b2[1];
 
-    GMlib::DMatrix<GMlib::Vector<T,3>> s, su, sv;
+    GMlib::DMatrix<GMlib::Vector<T,3> > s, su, sv;
 
     //GET LOCAL SURFACES
     // s, su, sv = evaluate(u,v,1,1)
+    for(int i = 0; i < 2; i++)
+    {
+        for(int j = 0; j < 2; j++)
+        {
+            GMlib::DMatrix<GMlib::Vector<T,3> > tempS = _c[indexU + i - 1][indexV + j - 1]->evaluateParent(u, v, 1, 1);
+            s[i][j] = tempS[0][0];
+            su[i][j] = tempS[1][0];
+            sv[i][j] = tempS[0][1];
+        }
+    }
 
-    s =_surface->evaluateParent(u, v, 1, 1);
+    /*s =_surface->evaluateParent(u, v, 1, 1)[0][0];
+    su =_surface->evaluateParent(u, v, 1, 1)[0][1];
+    sv =_surface->evaluateParent(u, v, 1, 1)[1][0];*/
 
 
-    this->_p[0][0] = bv * s ^ bu;
-    this->_p[0][1] = bv * s ^ bud + bv * su ^ bu;
-    this->_p[1][0] = bvd * s ^ bu + bv * sv ^ bu;
+    this->_p[0][0] = bv * (s ^ bu);
+    this->_p[0][1] = bv * (s ^ bud) + bv * (su ^ bu);
+    this->_p[1][0] = bvd * (s ^ bu) + bv * (sv ^ bu);
 
     /*
         bv * s * bu
@@ -138,38 +150,41 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
 /**
  * @brief MyERBSSurf<T>::makeKnotVector
  * @param vector Reference to the vector to create.
- * @param samples
- * @param dim
- * @param closed
- * @param starut
- * @param end
+ * @param samples Amount of knots
+ * @param dim Dimension
+ * @param closed Is vector closed?
+ * @param start Starting T
+ * @param end End T
+ *
+ *  Creates a knot vector with given parameters.
  */
 template<typename T>
 void MyERBSSurf<T>::makeKnotVector(KnotVector<T> &vector, int samples, int dim, bool closed, T start, T end)
 {
-    T delta = (end - start) /(samples-1);
+    T delta = (end - start) / (samples - 1);
+    //T delta = (end - start) /(samples);
+
 
     int order = dim + 1;
     vector.setDim(samples + order); //Sets the dimension for the knot vector
+    vector.setDelta(delta);
 
-    int knotValue = 0;
     int stepKnots = samples - order;
 
     for(int i = 0; i < order; i++)
     {
-        vector[i] = start + knotValue * delta;
+        vector[i] = start;
     }
 
     for(int i = 0; i < stepKnots; i++)
     {
-        knotValue++;
-        vector[i + order] = start + knotValue * delta;
+
+        vector[i + order] = start + (i+1) * delta;
     }
 
-    knotValue++;
     for(int i = 0; i < order; i++)
     {
-        vector[samples + 1] = start + knotValue*delta;
+        vector[samples + i] = end;
     }
 
     if(closed)
@@ -193,16 +208,17 @@ inline
  *  Create B vector for the given knot at given index.
  *      [0] - Value
  *      [1] - 1st derivative
- *      [2] - 2nd derivative
+ *      [2] - 2nd derivative (NOT IMPLEMENTED)
  */
 void MyERBSSurf<T>::makeBVector(GMlib::DVector<T> &bVector, const KnotVector<T> &k, int knotIndex, T t, int d)
 {
-    bVector.setDim(d+1);
+    //bVector.setDim(d+1);
+    bVector.setDim(2);
     _evaluator.set(k.getKnotValue(knotIndex), k.getKnotValue(knotIndex+1) - k.getKnotValue(knotIndex));
 
     bVector[0] = _evaluator(t);
     bVector[1] = _evaluator.getDer1();
-    bVector[2] = _evaluator.getDer2();
+    //bVector[2] = _evaluator.getDer2();
 }
 
 /**
