@@ -76,7 +76,7 @@ public slots:
   void                                  keyReleased( const QString& name, QKeyEvent* event );
   void                                  wheelEventOccurred( const QString& name, QWheelEvent* event );
 
-  //void                                  mouseMoved(const QString &name, QMouseEvent *event);
+  void                                  mouseMoved(const QString &name, QMouseEvent *event);
 protected:
   void                                  timerEvent(QTimerEvent *e);
 
@@ -89,6 +89,13 @@ private:
   std::shared_ptr<GMlib::Scene>                     _scene;
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
   std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
+
+  GMlib::Point<int,2> _currentMousePos;
+  GMlib::Point<int,2> _prevMousePos;
+
+  bool _moveObjectButtonPressed;
+  bool _selectMultipleObjectsPressed;
+  bool _rotateObjectButtonPressed;
 
 signals:
   void                                              signFrameReady();

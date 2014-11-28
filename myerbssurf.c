@@ -92,18 +92,8 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
 
     GMlib::DVector<T> b1, b2;
 
-    makeBVector(b1, _u, indexU, u, d1);
-    makeBVector(b2, _v, indexV, v, d2);
-
-    /*_evaluator.set(_u[indexU], _u[indexU+1] - _u[indexU] );
-    b1 = _evaluator(u);
-    b1d = _evaluator.getDer1();
-    //USE FOR U
-
-    _evaluator.set(_v[indexV], _v[indexV+1] - _v[indexV] );
-    b2 = _evaluator(u);
-    b2d = _evaluator.getDer1();
-    //USE FOR V*/
+    makeBVector(b1, _u, indexU, u, d1); //B vector for u knot
+    makeBVector(b2, _v, indexV, v, d2); //B vector for v knot
 
     GMlib::DVector<T> bu, bv, bud, bvd;
     bu.setDim(2); bv.setDim(2); bud.setDim(2); bvd.setDim(2);
@@ -115,7 +105,6 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
     GMlib::DMatrix<GMlib::Vector<T,3> > s, su, sv;
 
     //GET LOCAL SURFACES
-    // s, su, sv = evaluate(u,v,1,1)
     for(int i = 0; i < 2; i++)
     {
         for(int j = 0; j < 2; j++)
@@ -127,20 +116,9 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
         }
     }
 
-    /*s =_surface->evaluateParent(u, v, 1, 1)[0][0];
-    su =_surface->evaluateParent(u, v, 1, 1)[0][1];
-    sv =_surface->evaluateParent(u, v, 1, 1)[1][0];*/
-
-
     this->_p[0][0] = bv * (s ^ bu);
     this->_p[0][1] = bv * (s ^ bud) + bv * (su ^ bu);
     this->_p[1][0] = bvd * (s ^ bu) + bv * (sv ^ bu);
-
-    /*
-        bv * s * bu
-
-
-    */
 }
 
 //--------------------------------------------------
@@ -179,7 +157,7 @@ void MyERBSSurf<T>::makeKnotVector(KnotVector<T> &vector, int samples, int dim, 
     for(int i = 0; i < stepKnots; i++)
     {
 
-        vector[i + order] = start + (i+1) * delta;
+        vector[i + order] = start + (i+1) * vector.getDelta();
     }
 
     for(int i = 0; i < order; i++)
@@ -189,10 +167,15 @@ void MyERBSSurf<T>::makeKnotVector(KnotVector<T> &vector, int samples, int dim, 
 
     if(closed)
     {
-        vector[0] = vector[1] - (vector[samples-1] - vector[samples -2]);
-        vector[samples + order - 1] = vector[samples]+ (vector[2] - vector[1]);
+        vector[0] = vector[1] - vector.getDelta();
+        vector[samples + order - 1] = vector[samples]+ vector.getDelta();
     }
 
+
+    for(int i = 0; i < vector.getDim(); i++)
+    {
+        std::cout << "Knot@" << i << " " << vector[i] << std::endl;
+    }
 }
 
 template<typename T>

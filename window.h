@@ -35,6 +35,7 @@ signals:
   void      signKeyPressed( const QString& name, QKeyEvent* event );
   void      signKeyReleased( const QString& name, QKeyEvent* event );
   void      signWheelEventOccurred( const QString& name, QWheelEvent* event );
+  void      signMouseMoved(const QString& name, QMouseEvent* event);
 };
 
 #endif // WINDOW_H

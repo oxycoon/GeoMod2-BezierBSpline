@@ -20,3 +20,10 @@ T KnotVector<T>::getKnotValue(int index) const
 {
     return (*this)(index);
 }
+
+template<typename T>
+inline
+T KnotVector<T>::getDelta() const
+{
+    return _delta;
+}

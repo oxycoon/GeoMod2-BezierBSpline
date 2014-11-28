@@ -11,6 +11,7 @@ public:
 
     void setDelta(T delta);
     T getKnotValue(int index) const;
+    T getDelta() const;
 
 private:
     T _delta;

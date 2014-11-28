@@ -61,6 +61,7 @@ GuiApplication::onSGInit() {
   connect( _window.get(), &Window::signKeyPressed, _gmlib.get(), &GMlibWrapper::keyPressed );
   connect( _window.get(), &Window::signKeyReleased, _gmlib.get(), &GMlibWrapper::keyReleased );
   connect( _window.get(), &Window::signWheelEventOccurred, _gmlib.get(), &GMlibWrapper::wheelEventOccurred );
+  connect( _window.get(), &Window::signMouseMoved, _gmlib.get(), &GMlibWrapper::mouseMoved );
 
   // Init test scene of the GMlib wrapper
   _gmlib->initScene();
