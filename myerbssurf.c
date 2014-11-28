@@ -37,6 +37,10 @@ MyERBSSurf<T>::MyERBSSurf(GMlib::PSurf<T, 3> *original, int sampleU, int sampleV
     makeKnotVector(_u, sampleU, 1, _surface->isClosedU(), _surface->getParStartU(), _surface->getParEndU());
     makeKnotVector(_v, sampleV, 1, _surface->isClosedV(), _surface->getParStartV(), _surface->getParEndV());
     createSubSurfaces(_surface, sampleU, sampleV, _surface->isClosedU(), _surface->isClosedV());
+
+    _c[1][0]->translate(GMlib::Vector<float,3> (0, 0, 2));
+    _c[0][1]->translate(GMlib::Vector<float,3> (0, 0, 2));
+    _c[0][3]->translate(GMlib::Vector<float,3> (0, 2, -2));
 }
 
 template<typename T>
@@ -77,12 +81,6 @@ T MyERBSSurf<T>::getEndPV()
 }
 
 template<typename T>
-void MyERBSSurf<T>::localSimulate(double dt)
-{
-
-}
-
-template<typename T>
 void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
 {
     this->_p.setDim(d1+1, d2+1);
@@ -97,14 +95,15 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
 
     GMlib::DVector<T> bu, bv, bud, bvd;
     bu.setDim(2); bv.setDim(2); bud.setDim(2); bvd.setDim(2);
-    bu[0] = b1[0]; bu[1] = 1-b1[0];
-    bv[0] = b2[0]; bu[1] = 1-b2[0];
+    bu[1] = b1[0]; bu[0] = 1-b1[0];
+    bv[1] = b2[0]; bv[0] = 1-b2[0];
     bud[0] = -b1[1]; bud[1] = b1[1];
     bvd[0] = -b2[1]; bvd[1] = b2[1];
 
     GMlib::DMatrix<GMlib::Vector<T,3> > s, su, sv;
+    s.setDim(2,2); su.setDim(2,2); sv.setDim(2,2);
 
-    //GET LOCAL SURFACES
+    //Sets the s, su and sv matrices, which contain positions and derivatives.
     for(int i = 0; i < 2; i++)
     {
         for(int j = 0; j < 2; j++)
@@ -116,9 +115,18 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
         }
     }
 
+    s.transpose();
+    su.transpose();
+    sv.transpose();
+
+    //std::cout << s << std::endl;
+    std::cout << "BUV " <<bu[0]*bv[0] + bu[0]*bv[1] + bu[1]*bv[0] + bu[1]*bv[1] << std::endl;
+
     this->_p[0][0] = bv * (s ^ bu);
     this->_p[0][1] = bv * (s ^ bud) + bv * (su ^ bu);
     this->_p[1][0] = bvd * (s ^ bu) + bv * (sv ^ bu);
+
+    //std::cout << this->_p[0][0] << std::endl;
 }
 
 //--------------------------------------------------
@@ -141,7 +149,6 @@ void MyERBSSurf<T>::makeKnotVector(KnotVector<T> &vector, int samples, int dim, 
 {
     T delta = (end - start) / (samples - 1);
     //T delta = (end - start) /(samples);
-
 
     int order = dim + 1;
     vector.setDim(samples + order); //Sets the dimension for the knot vector
@@ -172,10 +179,7 @@ void MyERBSSurf<T>::makeKnotVector(KnotVector<T> &vector, int samples, int dim, 
     }
 
 
-    for(int i = 0; i < vector.getDim(); i++)
-    {
-        std::cout << "Knot@" << i << " " << vector[i] << std::endl;
-    }
+    //std::cout << vector << std::endl;
 }
 
 template<typename T>
@@ -197,7 +201,7 @@ void MyERBSSurf<T>::makeBVector(GMlib::DVector<T> &bVector, const KnotVector<T> 
 {
     //bVector.setDim(d+1);
     bVector.setDim(2);
-    _evaluator.set(k.getKnotValue(knotIndex), k.getKnotValue(knotIndex+1) - k.getKnotValue(knotIndex));
+    _evaluator.set(k.getKnotValue(knotIndex), k.getDelta());//k.getKnotValue(knotIndex+1) - k.getKnotValue(knotIndex));
 
     bVector[0] = _evaluator(t);
     bVector[1] = _evaluator.getDer1();
@@ -314,10 +318,15 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
 {
     _c.setDim(countU, countV);
 
+    GMlib::Matrix<GMlib::Material, 2, 2> matMat;
+    matMat[0][0] = GMlib::GMmaterial::Gold;
+    matMat[1][0] = GMlib::GMmaterial::Ruby;
+    matMat[0][1] = GMlib::GMmaterial::Sapphire;
+    matMat[1][1] = GMlib::GMmaterial::Silver;
 
-    for(int i = 1; i < countU + 1; i++)
+    for(int i = 1; i <= countU; i++)
     {
-        for(int j = 1; j < countV + 1; j++)
+        for(int j = 1; j <= countV; j++)
         {
             if(closedU && i == countU)
             {
@@ -333,10 +342,21 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
 
                 sub = new MySubSurface<T>(surf, _u.getKnotValue(i-1), _u.getKnotValue(i+1),
                                        _v.getKnotValue(j-1), _v.getKnotValue(j+1),
-                                       _u.getKnotValue(i), _v.getKnotValue(i));
+                                       _u.getKnotValue(i), _v.getKnotValue(j));
                 _c[i-1][j-1] = sub;
+
+
+                /*std::cout << "U: "<< _u.getKnotValue(i-1) << ", " <<  _u.getKnotValue(i+1) << std::endl;
+                std::cout << "V: "<< _v.getKnotValue(j-1) << ", " <<  _v.getKnotValue(j+1) << std::endl;
+                std::cout << "Current: " <<_u.getKnotValue(i) << ", " <<  _v.getKnotValue(j) << std::endl;
+
+                _c[i-1][j-1]->enableDefaultVisualizer();
+                _c[i-1][j-1]->setMaterial(matMat[i-1][j-1]);
+                _c[i-1][j-1]->replot(4, 4, 1, 1);
+                this->insert(_c[i-1][j-1]);*/
             }
         }
+
     }
 }
 

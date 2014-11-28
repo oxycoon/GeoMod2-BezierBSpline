@@ -292,13 +292,13 @@ void GMlibWrapper::initScene() {
     auto surface_visualizer = new GMlib::PSurfPointsVisualizer<float,3>;
 
     // Surface
-    /*auto surface = new TestTorus;
+    auto surface = new TestTorus;
 //    surface->toggleDefaultVisualizer();
-    surface->insertVisualizer(surface_visualizer);
+    /*surface->insertVisualizer(surface_visualizer);
     surface->replot(200,200,1,1);
-    //_scene->insert(surface);
+    _scene->insert(surface);*/
 
-    surface->test01();*/
+    //surface->test01();
 
 #endif
 
@@ -323,12 +323,19 @@ void GMlibWrapper::initScene() {
 
     _scene->insert(spline);*/
 
-    GMlib::PPlane<float>* surface = new GMlib::PPlane<float>(GMlib::Point<float,3>(0,0,0), GMlib::Vector<float,3>(5,0,0), GMlib::Vector<float,3>(0,0,5));
+    //GMlib::PPlane<float>* surface = new GMlib::PPlane<float>(GMlib::Point<float,3>(0,0,0), GMlib::Vector<float,3>(5,0,0), GMlib::Vector<float,3>(0,5,0));
+    /*surface->toggleDefaultVisualizer();
+    surface->replot(20, 20, 1, 1);
+    _scene->insert(surface);*/
+
 
     MyERBSSurf<float>* myErbs = new MyERBSSurf<float>(surface, 4, 4, 1, 1) ;
     myErbs->toggleDefaultVisualizer();
-    myErbs->replot(20, 20, 1, 1);
+    myErbs->setMaterial(GMlib::GMmaterial::Emerald);
+    myErbs->replot(40, 40, 1, 1);
     _scene->insert(myErbs);
+
+
 
   } _glsurface->doneCurrent();
 }
@@ -391,28 +398,6 @@ GMlibWrapper::mousePressed(const QString& name, QMouseEvent* event ) {
        }
 
        qDebug() << getScene()->getSelectedObjects().getSize();
-
-  /*const QPointF& pos = event->pos();
-
-  const auto& rc_select = _rc_pairs.at(name.toStdString());
-  const auto& rc_geo = rc_select.viewport.geometry;
-
-  GMlib::Vector<int,2> size(rc_geo.width(),rc_geo.height());
-  _select_renderer->setCamera(rc_select.camera.get());
-
-  GMlib::SceneObject* obj = {nullptr};
-  _glsurface->makeCurrent(); {
-
-    _select_renderer->reshape( size );
-    _select_renderer->select( 0 );
-
-    _select_renderer->prepare();
-
-    obj = _select_renderer->findObject(pos.x(),size(1)-pos.y()-1);
-
-  } _glsurface->doneCurrent();
-
-  if(obj) obj->toggleSelected();*/
 }
 
 void GMlibWrapper::mouseMoved(const QString &name, QMouseEvent *event)
@@ -540,7 +525,7 @@ GMlibWrapper::keyPressed(const QString& name, QKeyEvent* event) {
              // ERBS
              MyERBSSurf<float> *esObj = dynamic_cast<MyERBSSurf<float>*>( sel_obj );
 
-             /*
+
              // Hermite
              GMlib::HermiteSurfP2V2 *hs22Obj = dynamic_cast<GMlib::HermiteSurfP2V2*>(sel_obj);
              GMlib::HermiteSurfP3V2 *hs32Obj = dynamic_cast<GMlib::HermiteSurfP3V2*>(sel_obj);
@@ -548,17 +533,17 @@ GMlibWrapper::keyPressed(const QString& name, QKeyEvent* event) {
 
              // Bezier
              GMlib::PBezierSurf<float> *bsObj = dynamic_cast<GMlib::PBezierSurf<float>*>( sel_obj );
-                */
 
-             /*if( esObj ) {
+
+             if( esObj ) {
 
                  if( esObj->isLocalPatchesVisible() )
                      esObj->hideLocalPatches();
                  else
                      esObj->showLocalPatches();
 
-             }*/
-             /*else if( bsObj ) {
+             }
+             else if( bsObj ) {
 
                  Erbssurface *parent = dynamic_cast<Erbssurface*>( bsObj->getParent());
                  if( parent ) {
@@ -629,7 +614,7 @@ GMlibWrapper::keyPressed(const QString& name, QKeyEvent* event) {
          _glsurface->doneCurrent();
      }
 
-     /*if(event->key() == Qt::Key_P)
+     if(event->key() == Qt::Key_P)
      {
          _glsurface->makeCurrent();
 
@@ -639,10 +624,10 @@ GMlibWrapper::keyPressed(const QString& name, QKeyEvent* event) {
              GMlib::SceneObject *sel_obj = sel_objs(i);
 
              // ERBS
-             MyERBSSurf *esObj = dynamic_cast<Erbssurface*>( sel_obj );
-             GMlib::HermiteSurfP2V2 * hs22Obj = dynamic_cast<GMlib::HermiteSurfP2V2*>(sel_obj);
+             MyERBSSurf<float> *esObj = dynamic_cast<MyERBSSurf<float>*>( sel_obj );
+             /*GMlib::HermiteSurfP2V2 * hs22Obj = dynamic_cast<GMlib::HermiteSurfP2V2*>(sel_obj);
              GMlib::HermiteSurfP3V2 * hs32Obj = dynamic_cast<GMlib::HermiteSurfP3V2*>(sel_obj);
-             GMlib::HermiteSurfP3V3 * hs33Obj = dynamic_cast<GMlib::HermiteSurfP3V3*>(sel_obj);
+             GMlib::HermiteSurfP3V3 * hs33Obj = dynamic_cast<GMlib::HermiteSurfP3V3*>(sel_obj);*/
              GMlib::PCylinder<float> * cylObj = dynamic_cast<GMlib::PCylinder<float>*>(sel_obj);
 
              _replotLowMediumHigh += 2;
@@ -653,21 +638,21 @@ GMlibWrapper::keyPressed(const QString& name, QKeyEvent* event) {
              if( esObj )
                  esObj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
 
-             if(hs22Obj)
+             /*if(hs22Obj)
                  hs22Obj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
 
              if(hs32Obj)
                  hs32Obj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
 
              if(hs33Obj)
-                 hs33Obj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
+                 hs33Obj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);*/
 
              if(cylObj)
                  cylObj->replot(_replotLowMediumHigh*10,_replotLowMediumHigh*10,2,2);
 
          }
          _glsurface->doneCurrent();
-     }*/
+     }
 }
 
 void GMlibWrapper::keyReleased(const QString& name, QKeyEvent* event) {
@@ -709,6 +694,7 @@ void GMlibWrapper::wheelEventOccurred(const QString& name, QWheelEvent* event) {
     }
 
 }
+
 /*
 
 void

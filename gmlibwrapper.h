@@ -83,6 +83,7 @@ protected:
 
 private:
   int                                               _timer_id;
+  int                                               _replotLowMediumHigh;
 
   std::shared_ptr<GLContextSurfaceWrapper>          _glsurface;
 

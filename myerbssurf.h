@@ -28,7 +28,6 @@ protected:
     T getEndPU();
     T getEndPV();
 
-    void localSimulate(double dt);
     void eval(T u, T v, int d1, int d2, bool lu, bool lv);
     void makeKnotVector(KnotVector<T> &vector, int samples, int dim, bool closed, T start, T end);
     void makeBVector(GMlib::DVector<T> &bVector, const KnotVector<T> &k, int knotIndex, T t, int d);
