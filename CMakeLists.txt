@@ -65,7 +65,6 @@ set( HDRS
   knotvector.h
   mysubsurface.h
   myerbssurf.h
-  mybspline.h
   )
 
 set( SRCS

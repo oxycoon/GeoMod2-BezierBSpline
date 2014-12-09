@@ -17,7 +17,7 @@ class MyERBSSurf : public GMlib::PSurf<T, 3>
 
 public:
     MyERBSSurf();
-    MyERBSSurf(GMlib::PSurf<T,3> *original, int sampleU, int sampleV, int dim1, int dim2);
+    MyERBSSurf(GMlib::PSurf<T,3> *original, int sampleU, int sampleV, int dim1, int dim2, LocalSurfaceType type);
     ~MyERBSSurf();
 
 protected:

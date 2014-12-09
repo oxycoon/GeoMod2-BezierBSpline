@@ -9,7 +9,6 @@
 
 //DANIEL
 #include "mbeziersurface.h"
-#include "mybspline.h"
 #include "myerbssurf.h"
 #include "mysubsurface.h"
 
@@ -292,7 +291,7 @@ void GMlibWrapper::initScene() {
     auto surface_visualizer = new GMlib::PSurfPointsVisualizer<float,3>;
 
     // Surface
-    auto surface = new TestTorus;
+    //auto surface = new TestTorus;
 //    surface->toggleDefaultVisualizer();
     /*surface->insertVisualizer(surface_visualizer);
     surface->replot(200,200,1,1);
@@ -302,38 +301,48 @@ void GMlibWrapper::initScene() {
 
 #endif
 
-    /*GMlib::DMatrix<GMlib::Vector<float,3> > temp;
-    temp.setDim(3,3);
-    temp[0][0] = GMlib::Vector<float,3>(0,0,0);
-    temp[1][0] = GMlib::Vector<float,3>(1,0,0);
-    temp[2][0] = GMlib::Vector<float,3>(2,0,0);
-    temp[0][1] = GMlib::Vector<float,3>(0,1,0);
-    temp[1][1] = GMlib::Vector<float,3>(1,1,1);
-    temp[2][1] = GMlib::Vector<float,3>(2,1,0);
-    temp[0][2] = GMlib::Vector<float,3>(0,2,0);
-    temp[1][2] = GMlib::Vector<float,3>(1,2,0);
-    temp[2][2] = GMlib::Vector<float,3>(2,2,0);
+
+
+    GMlib::PPlane<float>* surface = new GMlib::PPlane<float>(GMlib::Point<float,3>(0,0,0), GMlib::Vector<float,3>(5,0,0), GMlib::Vector<float,3>(0,5,0));
+    /*surface->toggleDefaultVisualizer();
+    surface->replot(20, 20, 1, 1);
+    _scene->insert(surface);*/
+
+    MyERBSSurf<float>* myErbs = new MyERBSSurf<float>(surface, 4, 4, 1, 1, LocalSurfaceType::BEZIERSURFACE) ;
+    myErbs->toggleDefaultVisualizer();
+    myErbs->setMaterial(GMlib::GMmaterial::Emerald);
+    myErbs->replot(20, 20, 1, 1);
+    myErbs->setCollapsed(true);
+    _scene->insert(myErbs);
+
+
+   /* GMlib::DMatrix<GMlib::Vector<float,3> > temp;
+    temp.setDim(2,2);
+//    temp[0][0] = GMlib::Vector<float,3>(0,0,0);
+//    temp[1][0] = GMlib::Vector<float,3>(1,0,0);
+//    temp[2][0] = GMlib::Vector<float,3>(2,0,0);
+//    temp[0][1] = GMlib::Vector<float,3>(0,1,0);
+//    temp[1][1] = GMlib::Vector<float,3>(1,1,0);
+//    temp[2][1] = GMlib::Vector<float,3>(2,1,0);
+//    temp[0][2] = GMlib::Vector<float,3>(0,2,0);
+//    temp[1][2] = GMlib::Vector<float,3>(1,2,0);
+//    temp[2][2] = GMlib::Vector<float,3>(2,2,0);
+        temp[0][0] = GMlib::Vector<float,3>(0,0,0);
+        temp[1][0] = GMlib::Vector<float,3>(1,0,0);
+        temp[0][1] = GMlib::Vector<float,3>(0,1,0);
+        temp[1][1] = GMlib::Vector<float,3>(1,1,0);
+
+
 
     MBezierSurface<float>* spline = new MBezierSurface<float>(temp);// = new BezierBSpline<float>();
     //
     //spline->evaluate(temp, 3, 0.3f, 1.0f);
     //spline->insertVisualizer(surface_visualizer);
     spline->toggleDefaultVisualizer();
-    spline->replot(20,20,1,1);
+    spline->replot(20,20,2,2);
 
     _scene->insert(spline);*/
 
-    //GMlib::PPlane<float>* surface = new GMlib::PPlane<float>(GMlib::Point<float,3>(0,0,0), GMlib::Vector<float,3>(5,0,0), GMlib::Vector<float,3>(0,5,0));
-    /*surface->toggleDefaultVisualizer();
-    surface->replot(20, 20, 1, 1);
-    _scene->insert(surface);*/
-
-
-    MyERBSSurf<float>* myErbs = new MyERBSSurf<float>(surface, 4, 4, 1, 1) ;
-    myErbs->toggleDefaultVisualizer();
-    myErbs->setMaterial(GMlib::GMmaterial::Emerald);
-    myErbs->replot(40, 40, 1, 1);
-    _scene->insert(myErbs);
 
 
 

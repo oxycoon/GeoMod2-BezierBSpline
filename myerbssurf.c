@@ -1,7 +1,7 @@
 #include "myerbssurf.h"
 
 #include "mysubsurface.h"
-
+#include "mbeziersurface.h"
 
 //--------------------------------------------------
 //      CONSTRUCTORS
@@ -22,13 +22,9 @@ MyERBSSurf<T>::MyERBSSurf()
  */
 template<typename T>
 inline
-MyERBSSurf<T>::MyERBSSurf(GMlib::PSurf<T, 3> *original, int sampleU, int sampleV, int dim1, int dim2)
+MyERBSSurf<T>::MyERBSSurf(GMlib::PSurf<T, 3> *original, int sampleU, int sampleV, int dim1, int dim2, LocalSurfaceType type):
+    _surface(original), _bezierDegree1(dim1), _bezierDegree2(dim2), _localSurfaceType(type)
 {
-    _surface = original;
-
-    _bezierDegree1 = dim1;
-    _bezierDegree2 = dim2;
-
     if(_surface->isClosedU())
         sampleU++;
     if(_surface->isClosedV())
@@ -38,9 +34,9 @@ MyERBSSurf<T>::MyERBSSurf(GMlib::PSurf<T, 3> *original, int sampleU, int sampleV
     makeKnotVector(_v, sampleV, 1, _surface->isClosedV(), _surface->getParStartV(), _surface->getParEndV());
     createSubSurfaces(_surface, sampleU, sampleV, _surface->isClosedU(), _surface->isClosedV());
 
-    _c[1][0]->translate(GMlib::Vector<float,3> (0, 0, 2));
+    /*_c[1][0]->translate(GMlib::Vector<float,3> (0, 0, 2));
     _c[0][1]->translate(GMlib::Vector<float,3> (0, 0, 2));
-    _c[0][3]->translate(GMlib::Vector<float,3> (0, 2, -2));
+    _c[0][3]->translate(GMlib::Vector<float,3> (0, 2, -5));*/
 }
 
 template<typename T>
@@ -339,10 +335,23 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
             else
             {
                 GMlib::PSurf<T,3> *sub;
+                if(_localSurfaceType == LocalSurfaceType::SUBSURFACE)
+                {
 
-                sub = new MySubSurface<T>(surf, _u.getKnotValue(i-1), _u.getKnotValue(i+1),
-                                       _v.getKnotValue(j-1), _v.getKnotValue(j+1),
-                                       _u.getKnotValue(i), _v.getKnotValue(j));
+
+                    sub = new MySubSurface<T>(surf, _u.getKnotValue(i-1), _u.getKnotValue(i+1),
+                                           _v.getKnotValue(j-1), _v.getKnotValue(j+1),
+                                           _u.getKnotValue(i), _v.getKnotValue(j));
+
+                }
+                else if(_localSurfaceType == LocalSurfaceType::BEZIERSURFACE)
+                {
+                    sub = new MBezierSurface<T>(surf, _u.getKnotValue(i-1), _u.getKnotValue(i+1),
+                                             _v.getKnotValue(j-1), _v.getKnotValue(j+1),
+                                             _u.getKnotValue(i), _v.getKnotValue(j),
+                                             _bezierDegree1, _bezierDegree2);
+                }
+
                 _c[i-1][j-1] = sub;
 
 
