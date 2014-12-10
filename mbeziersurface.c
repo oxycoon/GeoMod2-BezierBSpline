@@ -28,7 +28,7 @@ MBezierSurface<T>::MBezierSurface(GMlib::PSurf<T,3> *surf, T startU, T endU, T s
     _deltaV = 1 / (_endV - _startV);
 
     T scaledU = (u - startU) / (endU - startU);
-    T scaledV = (u - startU) / (endU - startU);
+    T scaledV = (v - startV) / (endV - startV);
 
     computeControlPoints(_originalSurface, u, v, scaledU, scaledV);
 }
@@ -46,6 +46,10 @@ void MBezierSurface<T>::eval(T u, T v, int d1, int d2, bool, bool)
     b2.transpose();
 
     this->_p = b1 * (_c ^ b2);
+
+
+    std::cout << "U:" << u << ", V: " << v << std::endl;
+    std::cout << this->_p[0][0] << std::endl << std::endl;
 }
 
 template<typename T>
@@ -159,5 +163,8 @@ void MBezierSurface<T>::computeControlPoints(GMlib::PSurf<T,3> *surf, T u, T v, 
             _c[i][j] -= temp[0][0];
         }
     }
+    this->translate(temp[0][0]);
 
+
+    //std::cout << _c << std::endl;
 }

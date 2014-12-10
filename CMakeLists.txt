@@ -65,6 +65,7 @@ set( HDRS
   knotvector.h
   mysubsurface.h
   myerbssurf.h
+  mysurface.h
   )
 
 set( SRCS
@@ -74,6 +75,7 @@ set( SRCS
   guiapplication.cpp
   main.cpp
   window.cpp
+  mysurface.cpp
   )
 
 #########

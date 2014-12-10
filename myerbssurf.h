@@ -22,6 +22,7 @@ public:
 
 protected:
 
+    //void localSimulate(double dt);
 
     T getStartPU();
     T getStartPV();
@@ -41,7 +42,7 @@ protected:
 private:
     GMlib::PSurf<T,3>* _surface;
     GMlib::ERBSEvaluator<double> _evaluator;
-    GMlib::DMatrix<GMlib::PSurf<T,3>* > _c;
+    GMlib::DMatrix<GMlib::PSurf<T,3>* > _c; // Control points
 
     KnotVector<T> _u;
     KnotVector<T> _v;
@@ -49,7 +50,6 @@ private:
 
     int _bezierDegree1;
     int _bezierDegree2;
-
 
 
     void createSubSurfaces(GMlib::PSurf<T,3>* surf, int countU, int countV, bool closedU, bool closedV);
