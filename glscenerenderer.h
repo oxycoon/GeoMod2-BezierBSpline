@@ -93,6 +93,7 @@ signals:
   void                  signKeyPressed( const QString& name, QKeyEvent* event );
   void                  signKeyReleased( const QString& name, QKeyEvent* event );
   void                  signWheelEventOccurred( const QString& name, QWheelEvent* event);
+  void                  signMouseMoved( const QString& name, QMouseEvent* event );
 
 public slots:
   void                  sync();
@@ -108,6 +109,7 @@ protected slots:
   void                  keyReleaseEvent(QKeyEvent *event) override;
   void                  wheelEvent(QWheelEvent *event) override;
   void                  mouseDoubleClickEvent(QMouseEvent *event) override;
+  void                  mouseMoveEvent(QMouseEvent *event) override;
 
 private slots:
   void                  handleWindowChanged( QQuickWindow * window );

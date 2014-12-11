@@ -59,9 +59,13 @@ void MyERBSSurf<T>::localSimulate(double dt)
         4. optimalize
         5. replot at endx!*/
 
-    this->rotate( GMlib::Angle(90) * dt, GMlib::Vector<float,3>( 0.0f, 0.0f, 1.0f ) );
+    _c[1][0]->rotate( GMlib::Angle(90) * dt, GMlib::Vector<float,3>(1.0f, 0.0f, 0.0f));
+
+    _c[1][0]->replot();
+    //this->rotate( GMlib::Angle(90) * dt, GMlib::Vector<float,3>(0.0f, 0.0f, 1.0f));
 
     //this->replot();
+
 }
 
 //--------------------------------------------------

@@ -234,6 +234,7 @@ GLSceneRenderer::handleWindowChanged(QQuickWindow* window) {
   connect( w, &Window::beforeSynchronizing, this, &GLSceneRenderer::sync );
   connect( w, &Window::sceneGraphInvalidated, this, &GLSceneRenderer::cleanup );
   connect( w, &Window::signFrameReady, this, &QQuickItem::update );
+  connect( this, &GLSceneRenderer::signMouseMoved, w, &Window::signMouseMoved );
   connect( this, &GLSceneRenderer::signViewportChanged, w, &Window::signGuiViewportChanged );
   connect( this, &GLSceneRenderer::signMousePressed, w, &Window::signMousePressed );
   connect( this, &GLSceneRenderer::signMouseReleased, w, &Window::signMouseReleased);
@@ -241,6 +242,7 @@ GLSceneRenderer::handleWindowChanged(QQuickWindow* window) {
   connect( this, &GLSceneRenderer::signKeyPressed, w, &Window::signKeyPressed );
   connect( this, &GLSceneRenderer::signKeyReleased, w, &Window::signKeyReleased);
   connect( this, &GLSceneRenderer::signWheelEventOccurred, w, &Window::signWheelEventOccurred);
+
 }
 
 void GLSceneRenderer::itemChange(ItemChange change, const ItemChangeData& value) {
@@ -290,5 +292,11 @@ void GLSceneRenderer::mouseDoubleClickEvent(QMouseEvent* event) {
 
   setFocus(true,Qt::MouseFocusReason);
   emit signMouseDoubleClicked(_name,event);
+}
+
+void GLSceneRenderer::mouseMoveEvent(QMouseEvent *event)
+{
+    setFocus(true,Qt::MouseFocusReason);
+    emit signMouseMoved(_name, event);
 }
 
