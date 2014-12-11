@@ -1,12 +1,14 @@
 #ifndef MYERBSSURF_H
 #define MYERBSSURF_H
 
+#include "knotvector.h"
+#include "mysubsurface.h"
+
 #include <gmParametricsModule>
 
 #include <parametrics/evaluators/gmerbsevaluator.h>
 
-#include "knotvector.h"
-#include "mysubsurface.h"
+#include <memory>
 
 enum LocalSurfaceType{SUBSURFACE, BEZIERSURFACE};
 
@@ -22,7 +24,7 @@ public:
 
 protected:
 
-    //void localSimulate(double dt);
+    void localSimulate(double dt);
 
     T getStartPU();
     T getStartPV();
@@ -43,6 +45,7 @@ private:
     GMlib::PSurf<T,3>* _surface;
     GMlib::ERBSEvaluator<double> _evaluator;
     GMlib::DMatrix<GMlib::PSurf<T,3>* > _c; // Control points
+    std::shared_ptr<MyERBSSurf> _myERBSSurf{nullptr};
 
     KnotVector<T> _u;
     KnotVector<T> _v;

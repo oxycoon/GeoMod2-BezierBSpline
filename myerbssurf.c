@@ -10,7 +10,7 @@ template<typename T>
 inline
 MyERBSSurf<T>::MyERBSSurf()
 {
-}
+}//end constructor
 
 /**
  * @brief MyERBSSurf<T>::MyERBSSurf
@@ -33,30 +33,36 @@ MyERBSSurf<T>::MyERBSSurf(GMlib::PSurf<T, 3> *original, int sampleU, int sampleV
     makeKnotVector(_u, sampleU, 1, _surface->isClosedU(), _surface->getParStartU(), _surface->getParEndU());
     makeKnotVector(_v, sampleV, 1, _surface->isClosedV(), _surface->getParStartV(), _surface->getParEndV());
     createSubSurfaces(_surface, sampleU, sampleV, _surface->isClosedU(), _surface->isClosedV());
-}
+
+    this->translate(GMlib::Vector<float,3>(0.0f, 0.0f, 1.0f));
+
+    std::cout << "Amount of control points: " << std::endl;
+}//End constructor
 
 template<typename T>
 MyERBSSurf<T>::~MyERBSSurf()
 {
     delete _surface;
-}
+}//End deconstructor
 
-/*template<typename T>
+template<typename T>
 void MyERBSSurf<T>::localSimulate(double dt)
 {
-    this->localSimulate(dt);
+    //this->localSimulate(dt);
 
-        1.
+        /*1.
         2. p, u, v, uu, vv, uv, uuv, uvv, uuvv - 2nd derivative for bezier at least
         3. Decide movement
           - rotate
           - translate
           - scale
         4. optimalize
-        5. replot at endx!
+        5. replot at endx!*/
 
+    this->rotate( GMlib::Angle(90) * dt, GMlib::Vector<float,3>( 0.0f, 0.0f, 1.0f ) );
 
-}*/
+    //this->replot();
+}
 
 //--------------------------------------------------
 //      INHERITED FUNCTIONS
@@ -66,28 +72,28 @@ inline
 T MyERBSSurf<T>::getStartPU()
 {
     return _surface->getParStartU();
-}
+}//End getStartPU()
 
 template<typename T>
 inline
 T MyERBSSurf<T>::getStartPV()
 {
-    return _surface->getParStartU();
-}
+    return _surface->getParStartV();
+}//End getStartPV()
 
 template<typename T>
 inline
 T MyERBSSurf<T>::getEndPU()
 {
-    return _surface->getParEndV();
-}
+    return _surface->getParEndU();
+}//End getEndPU()
 
 template<typename T>
 inline
 T MyERBSSurf<T>::getEndPV()
 {
     return _surface->getParEndV();
-}
+}//End getEndPV()
 
 template<typename T>
 void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
@@ -118,7 +124,6 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
     {
         for(int j = 0; j < 2; j++)
         {
-
             T mappedU = mapKnot(u, _u[indexU+i-1], _u[indexU+i+1]);
             T mappedV = mapKnot(v, _v[indexV+j-1], _v[indexV+j+1]);
 
@@ -133,15 +138,10 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
     su.transpose();
     sv.transpose();
 
-    //std::cout << s << std::endl;
-    //std::cout << "BUV " <<bu[0]*bv[0] + bu[0]*bv[1] + bu[1]*bv[0] + bu[1]*bv[1] << std::endl;
-
     this->_p[0][0] = bv * (s ^ bu);
     this->_p[0][1] = bv * (s ^ bud) + bv * (su ^ bu);
     this->_p[1][0] = bvd * (s ^ bu) + bv * (sv ^ bu);
-
-    //std::cout << s[0][0] << std::endl;
-}
+}//End eval()
 
 //--------------------------------------------------
 //      PROTECTED KNOT VECTOR FUNCTIONS
@@ -172,25 +172,25 @@ void MyERBSSurf<T>::makeKnotVector(KnotVector<T> &vector, int samples, int dim, 
     for(int i = 0; i < order; i++)
     {
         vector[i] = start;
-    }
+    }//End for i
 
     for(int i = 0; i < stepKnots; i++)
     {
 
         vector[i + order] = start + (i+1) * vector.getDelta();
-    }
+    }//End for i
 
     for(int i = 0; i < order; i++)
     {
         vector[samples + i] = end;
-    }
+    }//End for i
 
     if(closed)
     {
         vector[0] = vector[1] - vector.getDelta();
         vector[samples + order - 1] = vector[samples]+ vector.getDelta();
-    }
-}
+    }//End if
+}//end makeKnotVector()
 
 template<typename T>
 inline
@@ -216,7 +216,7 @@ void MyERBSSurf<T>::makeBVector(GMlib::DVector<T> &bVector, const KnotVector<T> 
     bVector[0] = _evaluator(t);
     bVector[1] = _evaluator.getDer1();
     //bVector[2] = _evaluator.getDer2();
-}
+}//end makeBVector()
 
 /**
  * @brief MyERBSSurf<T>::findKnotIndex
@@ -236,12 +236,12 @@ int MyERBSSurf<T>::findKnotIndex(T t, const KnotVector<T> &vector, bool closed)
     {
         temp = 2;
         result = 1;
-    }
+    }//End if
     else
     {
         temp = 3;
         result = vector.getDim() - 3;
-    }
+    }//End else
 
     for(int i = 1; i <= vector.getDim() - temp; i++)
     {
@@ -252,10 +252,10 @@ int MyERBSSurf<T>::findKnotIndex(T t, const KnotVector<T> &vector, bool closed)
         {
             result = i;
             break;
-        }
-    }
+        }//End if
+    }//End for i
     return result;
-}
+}//End findKnotIndex()
 
 /**
  * @brief MyERBSSurf<T>::mapKnot
@@ -273,12 +273,12 @@ T MyERBSSurf<T>::mapKnot(T k, T start, T end)
     if(_localSurfaceType == SUBSURFACE)
     {
         return k;
-    }
+    }//End if
     else if(_localSurfaceType == BEZIERSURFACE)
     {
         return (k-start)/(end-start);
-    }
-}
+    }//End else
+}//End mapKnot()
 
 /**
  * @brief MyERBSSurf<T>::makeCMatrix
@@ -323,7 +323,7 @@ GMlib::DMatrix<GMlib::Vector<T, 3> > MyERBSSurf<T>::makeCMatrix(T u, T v, int uI
         }//End for j
     }//End for i
     return result;
-}
+}//End makeCMatrix()
 
 /**
  * @brief MyERBSSurf<T>::createSubSurfaces
@@ -353,11 +353,11 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
             if(closedU && i == countU)
             {
                 _c[i-1][j-1] = _c[0][j-1];
-            }
+            }//end if
             else if(closedV && j == countV)
             {
                 _c[i-1][j-1] = _c[i-1][0];
-            }
+            }//end else if
             else
             {
                 GMlib::PSurf<T,3> *sub;
@@ -381,6 +381,6 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
             }//End else
         }//End for j
     }//End for i
-}
+}//End creatSubSurfaces()
 
 
