@@ -23,6 +23,7 @@ public:
     ~MyERBSSurf();
 
 protected:
+    GMlib::DMatrix<GMlib::PSurf<T,3>* > _c; // Control points
 
     void localSimulate(double dt);
 
@@ -44,8 +45,6 @@ protected:
 private:
     GMlib::PSurf<T,3>* _surface;
     GMlib::ERBSEvaluator<double> _evaluator;
-    GMlib::DMatrix<GMlib::PSurf<T,3>* > _c; // Control points
-    std::shared_ptr<MyERBSSurf> _myERBSSurf{nullptr};
 
     KnotVector<T> _u;
     KnotVector<T> _v;

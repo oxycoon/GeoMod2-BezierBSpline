@@ -48,8 +48,6 @@ MyERBSSurf<T>::~MyERBSSurf()
 template<typename T>
 void MyERBSSurf<T>::localSimulate(double dt)
 {
-    //this->localSimulate(dt);
-
         /*1.
         2. p, u, v, uu, vv, uv, uuv, uvv, uuvv - 2nd derivative for bezier at least
         3. Decide movement
@@ -61,10 +59,10 @@ void MyERBSSurf<T>::localSimulate(double dt)
 
     _c[1][0]->rotate( GMlib::Angle(90) * dt, GMlib::Vector<float,3>(1.0f, 0.0f, 0.0f));
 
-    _c[1][0]->replot();
+    //_c[1][0]->replot();
     //this->rotate( GMlib::Angle(90) * dt, GMlib::Vector<float,3>(0.0f, 0.0f, 1.0f));
 
-    //this->replot();
+    this->replot();
 
 }
 
@@ -196,8 +194,6 @@ void MyERBSSurf<T>::makeKnotVector(KnotVector<T> &vector, int samples, int dim, 
     }//End if
 }//end makeKnotVector()
 
-template<typename T>
-inline
 /**
  * @brief MyERBSSurf<T>::makeBVector
  * @param bVector Reference to the vector which is being created
@@ -211,6 +207,8 @@ inline
  *      [1] - 1st derivative
  *      [2] - 2nd derivative (NOT IMPLEMENTED)
  */
+template<typename T>
+inline
 void MyERBSSurf<T>::makeBVector(GMlib::DVector<T> &bVector, const KnotVector<T> &k, int knotIndex, T t, int d)
 {
     //bVector.setDim(d+1);
@@ -344,11 +342,6 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
 {
     _c.setDim(countU, countV);
 
-    GMlib::Matrix<GMlib::Material, 2, 2> matMat;
-    matMat[0][0] = GMlib::GMmaterial::Gold;
-    matMat[1][0] = GMlib::GMmaterial::Ruby;
-    matMat[0][1] = GMlib::GMmaterial::Sapphire;
-    matMat[1][1] = GMlib::GMmaterial::Silver;
 
     for(int i = 1; i <= countU; i++)
     {

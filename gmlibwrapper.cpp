@@ -12,6 +12,7 @@
 #include "myerbssurf.h"
 #include "mysubsurface.h"
 #include "mysurface.h"
+#include "mywatersurface.h"
 
 // GMlib
 #include <gmOpenglModule>
@@ -309,16 +310,20 @@ void GMlibWrapper::initScene() {
     surface->replot(20, 20, 1, 1);
     _scene->insert(surface);*/
 
+    auto water = new MyWaterSurface(0.2f, 0.2f, 20, 20);
+    water->toggleDefaultVisualizer();
+    water->setMaterial(GMlib::GMmaterial::Turquoise);
+    _scene->insert(water);
 
-    auto surface = new MySurface(2.5f, 2.5f);
+    /*auto surface = new MySurface(2.5f, 2.5f);
 
 
-    MyERBSSurf<float>* myErbs = new MyERBSSurf<float>(surface, 5, 5, 2, 2, LocalSurfaceType::BEZIERSURFACE) ;
+    MyERBSSurf<float>* myErbs = new MyERBSSurf<float>(surface, 5, 5, 2, 2, LocalSurfaceType::SUBSURFACE) ;
     myErbs->toggleDefaultVisualizer();
     myErbs->setMaterial(GMlib::GMmaterial::Emerald);
     myErbs->replot(20, 20, 1, 1);
     //myErbs->setCollapsed(true);
-    _scene->insert(myErbs);
+    _scene->insert(myErbs);*/
 
   } _glsurface->doneCurrent();
 }
