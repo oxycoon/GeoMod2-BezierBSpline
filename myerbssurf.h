@@ -3,6 +3,7 @@
 
 #include "knotvector.h"
 #include "mysubsurface.h"
+#include "animation.h"
 
 #include <gmParametricsModule>
 
@@ -21,6 +22,8 @@ public:
     MyERBSSurf();
     MyERBSSurf(GMlib::PSurf<T,3> *original, int sampleU, int sampleV, int dim1, int dim2, LocalSurfaceType type);
     ~MyERBSSurf();
+
+    void setAnimation(Animation *animation);
 
 protected:
     GMlib::DMatrix<GMlib::PSurf<T,3>* > _c; // Control points
@@ -46,12 +49,16 @@ private:
     GMlib::PSurf<T,3>* _surface;
     GMlib::ERBSEvaluator<double> _evaluator;
 
+
     KnotVector<T> _u;
     KnotVector<T> _v;
     LocalSurfaceType _localSurfaceType;
 
     int _bezierDegree1;
     int _bezierDegree2;
+
+    Animation* _animation;
+    //bool _hasAnimation = false;
 
 
     void createSubSurfaces(GMlib::PSurf<T,3>* surf, int countU, int countV, bool closedU, bool closedV);

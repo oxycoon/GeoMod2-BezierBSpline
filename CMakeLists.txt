@@ -66,7 +66,8 @@ set( HDRS
   mysubsurface.h
   myerbssurf.h
   mysurface.h
-  mywatersurface.h
+  animation.h
+  wateranimation.h
   )
 
 set( SRCS
@@ -77,7 +78,7 @@ set( SRCS
   main.cpp
   window.cpp
   mysurface.cpp
-  mywatersurface.cpp
+  wateranimation.cpp
   )
 
 #########
