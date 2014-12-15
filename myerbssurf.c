@@ -47,7 +47,7 @@ void MyERBSSurf<T>::setAnimation(Animation *animation)
 {
     _animation = animation;
     //_hasAnimation = true;
-}//End deconstructor
+}
 
 template<typename T>
 void MyERBSSurf<T>::localSimulate(double dt)
@@ -68,7 +68,19 @@ void MyERBSSurf<T>::localSimulate(double dt)
 
     if(_animation != 0)
     {
+        static float x1 = _c[0][0]->getPos()(0);
+        static float x2 = _c[3][3]->getPos()(0);
         _animation->runAnimation(_c, dt);
+
+
+        std::cout << std::endl;
+        /*std::cout << "Surf 0,0: "<< _c[0][0]->getPos()(0) - x1 << std::endl;
+        std::cout << "Surf 3,3: "<< 2*(_c[3][3]->getPos()(0) - x2) << std::endl << std::endl;
+
+
+        x1 = _c[0][0]->getPos()(0);
+        x2 = _c[3][3]->getPos()(0);*/
+        //std::cout << "Diff:" << _c[0][0]->getPos()(0) - _c[3][3]->getPos()(0) << std::endl << std::endl;
     }
     this->replot();
 }
@@ -388,17 +400,17 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
     }//End for i
 
     ///////////////////////
-    /*_c[0][0]->toggleDefaultVisualizer();
+    _c[0][0]->toggleDefaultVisualizer();
     _c[0][0]->setMaterial(GMlib::GMmaterial::Emerald);
     _c[0][0]->replot(20, 20, 1, 1);
     this->insert(_c[0][0]);
 
-    _c[0][1]->toggleDefaultVisualizer();
+    /*_c[0][1]->toggleDefaultVisualizer();
     _c[0][1]->setMaterial(GMlib::GMmaterial::Ruby);
     _c[0][1]->replot(20, 20, 1, 1);
-    this->insert(_c[0][1]);
+    this->insert(_c[0][1]);*/
 
-    _c[0][2]->toggleDefaultVisualizer();
+    /*_c[0][2]->toggleDefaultVisualizer();
     _c[0][2]->setMaterial(GMlib::GMmaterial::Sapphire);
     _c[0][2]->replot(20, 20, 1, 1);
     this->insert(_c[0][2]);
@@ -421,9 +433,9 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
     /*_c[1][0]->toggleDefaultVisualizer();
     _c[1][0]->setMaterial(GMlib::GMmaterial::Emerald);
     _c[1][0]->replot(20, 20, 1, 1);
-    this->insert(_c[1][0]);
+    this->insert(_c[1][0]);*/
 
-    _c[1][1]->toggleDefaultVisualizer();
+    /*_c[1][1]->toggleDefaultVisualizer();
     _c[1][1]->setMaterial(GMlib::GMmaterial::Ruby);
     _c[1][1]->replot(20, 20, 1, 1);
     this->insert(_c[1][1]);
@@ -491,14 +503,14 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
     _c[3][2]->toggleDefaultVisualizer();
     _c[3][2]->setMaterial(GMlib::GMmaterial::Sapphire);
     _c[3][2]->replot(20, 20, 1, 1);
-    this->insert(_c[3][2]);
+    this->insert(_c[3][2]);*/
 
     _c[3][3]->toggleDefaultVisualizer();
     _c[3][3]->setMaterial(GMlib::GMmaterial::Silver);
     _c[3][3]->replot(20, 20, 1, 1);
     this->insert(_c[3][3]);
 
-    _c[3][4]->toggleDefaultVisualizer();
+    /*_c[3][4]->toggleDefaultVisualizer();
     _c[3][4]->setMaterial(GMlib::GMmaterial::Chrome);
     _c[3][4]->replot(20, 20, 1, 1);
     this->insert(_c[3][4]);
@@ -526,14 +538,14 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
     /*_c[4][3]->toggleDefaultVisualizer();
     _c[4][3]->setMaterial(GMlib::GMmaterial::Silver);
     _c[4][3]->replot(20, 20, 1, 1);
-    this->insert(_c[4][3]);
+    this->insert(_c[4][3]);*/
 
-    _c[4][4]->toggleDefaultVisualizer();
+    /*_c[4][4]->toggleDefaultVisualizer();
     _c[4][4]->setMaterial(GMlib::GMmaterial::Chrome);
     _c[4][4]->replot(20, 20, 1, 1);
-    this->insert(_c[4][4]);
+    this->insert(_c[4][4]);*/
 
-    _c[4][5]->toggleDefaultVisualizer();
+    /*_c[4][5]->toggleDefaultVisualizer();
     _c[4][5]->setMaterial(GMlib::GMmaterial::Chrome);
     _c[4][5]->replot(20, 20, 1, 1);
     this->insert(_c[4][5]);*/

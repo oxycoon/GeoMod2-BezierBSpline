@@ -17,6 +17,7 @@ public:
     //~MBezierSurface(){}
 
     //void evaluate(GMlib::DMatrix<T> &matrix, int d, T t, T delta);
+    void translate(const GMlib::Vector<T,3> &trans_vector);
 
 protected:
     void eval( T u, T v, int d1, int d2, bool lu = true, bool lv = true);

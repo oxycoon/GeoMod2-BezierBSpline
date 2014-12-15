@@ -12,20 +12,20 @@ void FishAnimation::runAnimation(GMlib::DMatrix<GMlib::PSurf<float,3> *> &surfac
 
 
     float moveGradient = 0.0f;
+    GMlib::Vector<float,3> translate;
 
+    float swimMovement = cos(/*moveGradient + */ _time);
+    translate = GMlib::Vector<float,3>(swimMovement, 0.0f, 0.0f);
+
+    translate *= 0.01f;
     for(int i = 0; i < xSize; i++)
     {
-        for(int j = 0; j < ySize; j++)
+        for(int j = 0; j < ySize-1; j++)
         {
             GMlib::PSurf<float,3>* surf = surfaces[i][j];
-            GMlib::Vector<float,3> translate;
 
-            float swimMovement = cos(/*moveGradient + */_time);
-            translate = GMlib::Vector<float,3>(swimMovement, 0.0f, 0.0f);
-
-            translate *= dt;
             surf->translate(translate);
         }
-        moveGradient += 1.0f/xSize;
+        //moveGradient += 1.0f/xSize;
     }
 }

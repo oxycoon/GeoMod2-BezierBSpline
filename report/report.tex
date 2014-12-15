@@ -178,12 +178,14 @@ One part of the task was to create a special effect using the self implemented E
  0 \leq u \leq \pi, 0 \leq v \leq 2\pi
 \end{split}
 \end{equation}
-This fish is then to be animated to look, from the front, like it's swimming. Then to add to the effect I will make a flat plane and animate it with waves, to look like water. Finally, 
+This fish is then to be animated to look, from the front, like it's swimming. Then to add to the effect I will make a flat plane and animate it with waves, to look like water. 
 
 \section{Conclusion}
 The implementation of the ERBS-surface with both sub surface and bezier went mostly without problems. The biggest problems I encountered were caused by typos in my code, like by mistake typing u for v and vice versa. The creation of the animation, however was a much bigger challenge than anticipated, 
-as the control points were somewhat difficult to manipulate with the surface I had created. The water animation also gave me problems, which I have been unable to find the cause for. The simple function I had created to create the waves were insufficient to make the animation, as the plane would continue
-to escalate and grow, instead of having a smooth wave pattern. 
+as the control points were somewhat difficult to manipulate with the surface I had created. I found the root of the problem to be the fact that the surface is closed in v-direction, which caused the ends of the surface to be translated twice. 
+
+The water animation also gave me problems, which I have been unable to find the cause for. The simple function I had created to create the waves were insufficient to make the animation, as the plane would continue
+to escalate and grow, instead of having a smooth wave pattern. Because of this I simplified it down to just a sinus wave. 
 
 \paragraph{The source code}
 for this project can be found on: https://github.com/oxycoon/GeoMod2-BezierBSpline.

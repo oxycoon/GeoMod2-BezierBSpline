@@ -34,6 +34,15 @@ MBezierSurface<T>::MBezierSurface(GMlib::PSurf<T,3> *surf, T startU, T endU, T s
 }
 
 template<typename T>
+inline
+void MBezierSurface<T>::translate(const GMlib::Vector<T,3> &trans_vector)
+{
+    std::cout << "Surf - " << this->getName() << " trans vector: " << trans_vector << std::endl;
+
+    GMlib::Parametrics<T,2,3>::translate(trans_vector);
+}
+
+template<typename T>
 void MBezierSurface<T>::eval(T u, T v, int d1, int d2, bool, bool)
 {
     this->_p.setDim(d1 + 1, d2 + 1);
