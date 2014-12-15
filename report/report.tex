@@ -24,14 +24,14 @@ GMlib is an open source geometric modelling library developed and maintained at 
 
 \section{Method}
 \subsection{Bezier and the evaluator}
-A bezier curve is a parametrized curve with knot vectors which range from 0 to 1 and can be defined for any degree n. Higher dimensions of bezier curves are called bezier surfaces and they are defined by a set of control points and the position of a point P is is given by the parametric coordinates u and v: 
+A bezier curve is a parametrized curve with knot vectors which range from 0 to 1 and can be defined for any degree n. Higher dimensions of bezier curves are called bezier surfaces and they are defined by a set of control points and the position of a point P is is given by the parametric coordinates u and v.
 
 
-\begin{equation} \label{eq:BezierPPoint}
-P(u, v) = \sum_{i=0}^{n}\sum_{j=0}^{m} B_{i}^{n}(u) B_{j}^{m}(v)k_{i,j}
-\end{equation}
+%\begin{equation} \label{eq:BezierPPoint}
+%P(u, v) = \sum_{i=0}^{n}\sum_{j=0}^{m} B_{i}^{n}(u) B_{j}^{m}(v)k_{i,j}
+%\end{equation}
 
-There are three different types of evaluators used for Bezier curves: de Casteljau algorithm, a Cox/de'Boor algorithm and computing the Bernstein polynomials directly \cite{art_ierbs}. In this project, I have used a Cox/deBor algorithm: computing from the left. The algorithm starts by filling in the matrix with the Bernstein polynomial between first and the requested degree.
+There are three different types of evaluators used for Bezier curves: de Casteljau algorithm, a Cox/de'Boor algorithm and computing the Bernstein polynomials directly \cite{book_bperbs}. In this project, I have used a Cox/deBor algorithm: computing from the left. The algorithm starts by filling in the matrix with the Bernstein polynomial between first and the requested degree.
 
 \label{fig:bezierEval1}
 \begin{lstlisting}[frame=single, caption={Assigning the top half of the matrix.}] 
@@ -51,7 +51,7 @@ function compute basis matrix(matrix, degree, t, delta)
   end for
 \end{lstlisting}
 
-Following this every row except the first one is multiplied with the delta and derivatives. Because the Bezier surface ranges from 0 to 1, a scaling parameter is introduced and multiplied into every row except the first. 
+Following this every row except the first one is multiplied with the delta and derivatives.  
 
 \label{fig:bezierEval2}
 \begin{lstlisting}[frame=single, caption={Assigning the bottom half of the matrix}] 
@@ -71,8 +71,15 @@ Following this every row except the first one is multiplied with the delta and d
 end function
 \end{lstlisting}
 
+Because the Bezier surface ranges from 0 to 1, a scaling parameter is introduced and multiplied into every row except the first. It is written by course professor Lakså in a paper from 2010: ``If the domain of the Bezier curve is scaled, as is the norm, because of the global/local affine mapping, then, in order to compute, for instance, the local Bezier curve $c_{i}(t)$, the j-th derivatives actually have to be scaled by the global/local ''scaling factor`` $\delta_{i}^{j}$ where
+
+\begin{equation}
+ \delta_{i} = \frac{1}{t_{i+1}-t_{i-1}}
+\end{equation}
+as described in Theorem 1. The numerator in the fraction is 1 because the domain of the Bezier curves is [0,1]. Because the matrix is supposed to be used both in Hermite interpolatino and in the evaluation of local curvse, this matrix has to include the scaling, as described earlier.'' \cite{art_gmbf}.
+
 \subsection{B-spline}
-A b-spline is a curve which has knot definitions ranging from 0 to n. 
+A b-spline is a curve which has knot definitions ranging from 0 to n. Formula ~\ref{eq:bspline} shows the formula for a b-spline \cite{book_bperbs}. 
 \begin{multline} \label{eq:bspline}
 c(t)=\begin{pmatrix}
 1-w_{1,i}(t) & w_{1,i}(t)
@@ -94,7 +101,7 @@ c_{i-1}\\
 c_{i}
 \end{pmatrix}
 \end{multline}
-Formula ~\ref{eq:bspline} shows the formula for a b-spline \cite{art_ierbs}. The evaluator for a B-spline is very similar to the Bezier algorithm, however a B-spline has multiple interior knots which makes it necessary to find the corresponding knot-index to t. Therefore instead of using t in the matrix, we introduce a function w which maps the value between 0 and 1. This function is dependant on the knot index, knot value and the Berstein polynomial degree. 
+The evaluator for a B-spline is very similar to the Bezier algorithm, however a B-spline has multiple interior knots which makes it necessary to find the corresponding knot-index to t. Therefore instead of using t in the matrix, we introduce a function w which maps the value between 0 and 1. This function is dependant on the knot index, knot value and the Berstein polynomial degree. 
 
 
 \subsection{Expressional rational B spline (ERBS), and ERBS surfaces}
@@ -127,6 +134,6 @@ MyERBSSurface is capable of receiving a surface to copy and convert it to an ERB
 
 
 \section{Conclusion}
-//\bibliographystyle{abbrv}
+\bibliographystyle{alpha}
 \bibliography{sources}
 \end{document}
