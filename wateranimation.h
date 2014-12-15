@@ -6,9 +6,12 @@
 class WaterAnimation : public Animation
 {
 public:
-    WaterAnimation();
+    WaterAnimation(float height = 1.0f, float length = 1.0f);
 
     void runAnimation(GMlib::DMatrix<GMlib::PSurf<float,3>* > &surfaces, double dt);
+
+private:
+    float _waveHeight, _waveLength;
 
 };
 

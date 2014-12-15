@@ -26,6 +26,9 @@ protected:
     T getEndPU();
     T getEndPV();
 
+    bool isClosedU() const;
+    bool isClosedV() const;
+
 
 private:
     GMlib::DMatrix<GMlib::Vector<T,3> > _c;

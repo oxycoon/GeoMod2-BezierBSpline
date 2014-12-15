@@ -74,10 +74,7 @@ void MyERBSSurf<T>::localSimulate(double dt)
     {
         _animation->runAnimation(_c, dt);
     }
-
-
     this->replot();
-
 }
 
 //--------------------------------------------------
@@ -386,12 +383,165 @@ void MyERBSSurf<T>::createSubSurfaces(GMlib::PSurf<T,3> *surf, int countU, int c
                     sub = new MBezierSurface<T>(surf, _u.getKnotValue(i-1), _u.getKnotValue(i+1),
                                              _v.getKnotValue(j-1), _v.getKnotValue(j+1),
                                              _u.getKnotValue(i), _v.getKnotValue(j),
-                                             _bezierDegree1, _bezierDegree2);
+                                             _bezierDegree1, _bezierDegree2, closedU, closedV);
                 }//End else if
                 _c[i-1][j-1] = sub;
             }//End else
         }//End for j
     }//End for i
+
+    ///////////////////////
+    /*_c[0][0]->toggleDefaultVisualizer();
+    _c[0][0]->setMaterial(GMlib::GMmaterial::Emerald);
+    _c[0][0]->replot(20, 20, 1, 1);
+    this->insert(_c[0][0]);
+
+    _c[0][1]->toggleDefaultVisualizer();
+    _c[0][1]->setMaterial(GMlib::GMmaterial::Ruby);
+    _c[0][1]->replot(20, 20, 1, 1);
+    this->insert(_c[0][1]);
+
+    _c[0][2]->toggleDefaultVisualizer();
+    _c[0][2]->setMaterial(GMlib::GMmaterial::Sapphire);
+    _c[0][2]->replot(20, 20, 1, 1);
+    this->insert(_c[0][2]);
+
+    _c[0][3]->toggleDefaultVisualizer();
+    _c[0][3]->setMaterial(GMlib::GMmaterial::Silver);
+    _c[0][3]->replot(20, 20, 1, 1);
+    this->insert(_c[0][3]);
+
+    _c[0][4]->toggleDefaultVisualizer();
+    _c[0][4]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[0][4]->replot(20, 20, 1, 1);
+    this->insert(_c[0][4]);
+
+    _c[0][5]->toggleDefaultVisualizer();
+    _c[0][5]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[0][5]->replot(20, 20, 1, 1);
+    this->insert(_c[0][5]);*/
+    ///////////////////////
+    /*_c[1][0]->toggleDefaultVisualizer();
+    _c[1][0]->setMaterial(GMlib::GMmaterial::Emerald);
+    _c[1][0]->replot(20, 20, 1, 1);
+    this->insert(_c[1][0]);
+
+    _c[1][1]->toggleDefaultVisualizer();
+    _c[1][1]->setMaterial(GMlib::GMmaterial::Ruby);
+    _c[1][1]->replot(20, 20, 1, 1);
+    this->insert(_c[1][1]);
+
+    _c[1][2]->toggleDefaultVisualizer();
+    _c[1][2]->setMaterial(GMlib::GMmaterial::Sapphire);
+    _c[1][2]->replot(20, 20, 1, 1);
+    this->insert(_c[1][2]);
+
+    _c[1][3]->toggleDefaultVisualizer();
+    _c[1][3]->setMaterial(GMlib::GMmaterial::Silver);
+    _c[1][3]->replot(20, 20, 1, 1);
+    this->insert(_c[1][3]);
+
+    _c[1][4]->toggleDefaultVisualizer();
+    _c[1][4]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[1][4]->replot(20, 20, 1, 1);
+    this->insert(_c[1][4]);
+
+    _c[1][5]->toggleDefaultVisualizer();
+    _c[1][5]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[1][5]->replot(20, 20, 1, 1);
+    this->insert(_c[1][5]);*/
+    ///////////////////////
+    /*_c[2][0]->toggleDefaultVisualizer();
+    _c[2][0]->setMaterial(GMlib::GMmaterial::Emerald);
+    _c[2][0]->replot(20, 20, 1, 1);
+    this->insert(_c[2][0]);
+
+    _c[2][1]->toggleDefaultVisualizer();
+    _c[2][1]->setMaterial(GMlib::GMmaterial::Ruby);
+    _c[2][1]->replot(20, 20, 1, 1);
+    this->insert(_c[2][1]);
+
+    _c[2][2]->toggleDefaultVisualizer();
+    _c[2][2]->setMaterial(GMlib::GMmaterial::Sapphire);
+    _c[2][2]->replot(20, 20, 1, 1);
+    this->insert(_c[2][2]);
+
+    _c[2][3]->toggleDefaultVisualizer();
+    _c[2][3]->setMaterial(GMlib::GMmaterial::Silver);
+    _c[2][3]->replot(20, 20, 1, 1);
+    this->insert(_c[2][3]);
+
+    _c[2][4]->toggleDefaultVisualizer();
+    _c[2][4]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[2][4]->replot(20, 20, 1, 1);
+    this->insert(_c[2][4]);
+
+    _c[2][5]->toggleDefaultVisualizer();
+    _c[2][5]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[2][5]->replot(20, 20, 1, 1);
+    this->insert(_c[2][5]);*/
+    ///////////////////////
+    /*_c[3][0]->toggleDefaultVisualizer();
+    _c[3][0]->setMaterial(GMlib::GMmaterial::Emerald);
+    _c[3][0]->replot(20, 20, 1, 1);
+    this->insert(_c[3][0]);
+
+    _c[3][1]->toggleDefaultVisualizer();
+    _c[3][1]->setMaterial(GMlib::GMmaterial::Ruby);
+    _c[3][1]->replot(20, 20, 1, 1);
+    this->insert(_c[3][1]);
+
+    _c[3][2]->toggleDefaultVisualizer();
+    _c[3][2]->setMaterial(GMlib::GMmaterial::Sapphire);
+    _c[3][2]->replot(20, 20, 1, 1);
+    this->insert(_c[3][2]);
+
+    _c[3][3]->toggleDefaultVisualizer();
+    _c[3][3]->setMaterial(GMlib::GMmaterial::Silver);
+    _c[3][3]->replot(20, 20, 1, 1);
+    this->insert(_c[3][3]);
+
+    _c[3][4]->toggleDefaultVisualizer();
+    _c[3][4]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[3][4]->replot(20, 20, 1, 1);
+    this->insert(_c[3][4]);
+
+    _c[3][5]->toggleDefaultVisualizer();
+    _c[3][5]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[3][5]->replot(20, 20, 1, 1);
+    this->insert(_c[3][5]);*/
+    ///////////////////////
+    /*_c[4][0]->toggleDefaultVisualizer();
+    _c[4][0]->setMaterial(GMlib::GMmaterial::Emerald);
+    _c[4][0]->replot(20, 20, 1, 1);
+    this->insert(_c[4][0]);
+
+    _c[4][1]->toggleDefaultVisualizer();
+    _c[4][1]->setMaterial(GMlib::GMmaterial::Ruby);
+    _c[4][1]->replot(20, 20, 1, 1);
+    this->insert(_c[4][1]);*/
+
+    /*_c[4][2]->toggleDefaultVisualizer();
+    _c[4][2]->setMaterial(GMlib::GMmaterial::Sapphire);
+    _c[4][2]->replot(20, 20, 1, 1);
+    this->insert(_c[4][2]);*/
+
+    /*_c[4][3]->toggleDefaultVisualizer();
+    _c[4][3]->setMaterial(GMlib::GMmaterial::Silver);
+    _c[4][3]->replot(20, 20, 1, 1);
+    this->insert(_c[4][3]);
+
+    _c[4][4]->toggleDefaultVisualizer();
+    _c[4][4]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[4][4]->replot(20, 20, 1, 1);
+    this->insert(_c[4][4]);
+
+    _c[4][5]->toggleDefaultVisualizer();
+    _c[4][5]->setMaterial(GMlib::GMmaterial::Chrome);
+    _c[4][5]->replot(20, 20, 1, 1);
+    this->insert(_c[4][5]);*/
+
+
 }//End creatSubSurfaces()
 
 

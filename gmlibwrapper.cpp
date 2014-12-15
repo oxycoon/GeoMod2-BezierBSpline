@@ -12,6 +12,7 @@
 #include "myerbssurf.h"
 #include "mysubsurface.h"
 #include "mysurface.h"
+#include "fishanimation.h"
 #include "wateranimation.h"
 
 // GMlib
@@ -305,28 +306,24 @@ void GMlibWrapper::initScene() {
 
 
 
-    GMlib::PPlane<float>* waterPlane = new GMlib::PPlane<float>(GMlib::Point<float,3>(-5.0f, -5.0, 0.0f), GMlib::Vector<float,3>(10.0f, 0.0f, 0.0f), GMlib::Vector<float,3>(0.0f, 10.0f, 0.0f));
-    MyERBSSurf<float> *water = new MyERBSSurf<float>(waterPlane, 20, 20, 2, 2, LocalSurfaceType::BEZIERSURFACE);
+    ///WATER
+    /*GMlib::PPlane<float>* waterPlane = new GMlib::PPlane<float>(GMlib::Point<float,3>(-5.0f, -5.0, 0.0f), GMlib::Vector<float,3>(10.0f, 0.0f, 0.0f), GMlib::Vector<float,3>(0.0f, 10.0f, 0.0f));
+    MyERBSSurf<float> *water = new MyERBSSurf<float>(waterPlane, 20, 20, 2, 2, LocalSurfaceType::SUBSURFACE);
     water->setAnimation(new WaterAnimation());
     water->toggleDefaultVisualizer();
     water->setMaterial(GMlib::GMmaterial::Turquoise);
-    _scene->insert(water);
-
-    /*auto water = new MyWaterSurface(10.0f, 10.0f, 0.2f, 0.2f, 20, 20);
-    water->toggleDefaultVisualizer();
-    water->setMaterial(GMlib::GMmaterial::Turquoise);
-    water->replot(20, 20, 1, 1);
     _scene->insert(water);*/
 
-    /*auto surface = new MySurface(2.5f, 2.5f);
 
-
+    ///FISH
+    auto surface = new MySurface(2.5f, 2.5f);
     MyERBSSurf<float>* myErbs = new MyERBSSurf<float>(surface, 5, 5, 2, 2, LocalSurfaceType::SUBSURFACE) ;
     myErbs->toggleDefaultVisualizer();
     myErbs->setMaterial(GMlib::GMmaterial::Emerald);
+    myErbs->setAnimation(new FishAnimation());
     myErbs->replot(20, 20, 1, 1);
     //myErbs->setCollapsed(true);
-    _scene->insert(myErbs);*/
+    _scene->insert(myErbs);
 
   } _glsurface->doneCurrent();
 }

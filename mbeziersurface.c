@@ -53,27 +53,45 @@ void MBezierSurface<T>::eval(T u, T v, int d1, int d2, bool, bool)
 }
 
 template<typename T>
+inline
 T MBezierSurface<T>::getStartPU()
 {
     return 0;
 }
 
 template<typename T>
+inline
 T MBezierSurface<T>::getStartPV()
 {
     return 0;
 }
 
 template<typename T>
+inline
 T MBezierSurface<T>::getEndPU()
 {
     return 1;
 }
 
 template<typename T>
+inline
 T MBezierSurface<T>::getEndPV()
 {
     return 1;
+}
+
+template<typename T>
+inline
+bool MBezierSurface<T>::isClosedU() const
+{
+    return _isClosedU;
+}
+
+template<typename T>
+inline
+bool MBezierSurface<T>::isClosedV() const
+{
+    return _isClosedV;
 }
 
 /**

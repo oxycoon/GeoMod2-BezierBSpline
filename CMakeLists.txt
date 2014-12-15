@@ -68,6 +68,7 @@ set( HDRS
   mysurface.h
   animation.h
   wateranimation.h
+  fishanimation.h
   )
 
 set( SRCS
@@ -79,6 +80,7 @@ set( SRCS
   window.cpp
   mysurface.cpp
   wateranimation.cpp
+  fishanimation.cpp
   )
 
 #########
