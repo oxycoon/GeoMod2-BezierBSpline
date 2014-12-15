@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 
 # Global name of the project
-project(QMLGMlibTest)
+project(MyERBSDaniel)
 
 # Version
 set(VERSION_MAJOR 0)

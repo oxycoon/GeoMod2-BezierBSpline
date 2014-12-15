@@ -24,9 +24,9 @@ void WaterAnimation::runAnimation(GMlib::DMatrix<GMlib::PSurf<float,3>* > &surfa
             GMlib::Vector<float,3> translate;
             float zTranslate = sin(_waveLength * (float)(i/*piOverX*/) + _time) * cos(_waveLength * (float)(j/*piOverY*/) + _time) * _waveHeight;
 
-            float u = surf->getParStartU() + (surf->getParEndU() - surf->getParStartU())/2.0f;
+            /*float u = surf->getParStartU() + (surf->getParEndU() - surf->getParStartU())/2.0f;
             float v = surf->getParStartV() + (surf->getParEndV() - surf->getParStartV())/2.0f;
-            surf->evaluate(u, v, 1, 1);
+            surf->evaluate(u, v, 1, 1);*/
             translate = GMlib::Vector<float,3>(0.0f, 0.0f, zTranslate);
             //translate.normalize();
 

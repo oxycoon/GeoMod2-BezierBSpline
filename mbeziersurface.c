@@ -46,10 +46,6 @@ void MBezierSurface<T>::eval(T u, T v, int d1, int d2, bool, bool)
     b2.transpose();
 
     this->_p = b1 * (_c ^ b2);
-
-
-    std::cout << "U:" << u << ", V: " << v << std::endl;
-    std::cout << this->_p[0][0] << std::endl << std::endl;
 }
 
 template<typename T>

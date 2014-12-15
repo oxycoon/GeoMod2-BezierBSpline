@@ -33,10 +33,6 @@ MyERBSSurf<T>::MyERBSSurf(GMlib::PSurf<T, 3> *original, int sampleU, int sampleV
     makeKnotVector(_u, sampleU, 1, _surface->isClosedU(), _surface->getParStartU(), _surface->getParEndU());
     makeKnotVector(_v, sampleV, 1, _surface->isClosedV(), _surface->getParStartV(), _surface->getParEndV());
     createSubSurfaces(_surface, sampleU, sampleV, _surface->isClosedU(), _surface->isClosedV());
-
-    this->translate(GMlib::Vector<float,3>(0.0f, 0.0f, 1.0f));
-
-    std::cout << "Amount of control points: " << std::endl;
 }//End constructor
 
 template<typename T>
@@ -131,7 +127,6 @@ void MyERBSSurf<T>::eval(T u, T v, int d1, int d2, bool lu, bool lv)
     GMlib::DMatrix<GMlib::Vector<T,3> > s, su, sv;
     s.setDim(2,2); su.setDim(2,2); sv.setDim(2,2);
 
-
     //Sets the s, su and sv matrices, which contain positions and derivatives.
     for(int i = 0; i < 2; i++)
     {
@@ -210,7 +205,7 @@ void MyERBSSurf<T>::makeKnotVector(KnotVector<T> &vector, int samples, int dim, 
  * @param bVector Reference to the vector which is being created
  * @param k Knot vector to use
  * @param knotIndex Index of the item
- * @param t
+ * @param t value
  * @param d dimension
  *
  *  Create B vector for the given knot at given index.
@@ -304,9 +299,11 @@ T MyERBSSurf<T>::mapKnot(T k, T start, T end)
  * @return
  *
  *  Creates the matrix of control points for the local surfaces.
+ *
+ *  !!!UNUSED!!!
  */
 template <typename T>
-GMlib::DMatrix<GMlib::Vector<T, 3> > MyERBSSurf<T>::makeCMatrix(T u, T v, int uIndex, int vIndex, int d1, int d2)
+GMlib::DMatrix<GMlib::Vector<T,3> > MyERBSSurf<T>::makeCMatrix(T u, T v, int uIndex, int vIndex, int d1, int d2)
 {
     //TODO: Create for bezier, this is just for sub surface
     GMlib::DMatrix<GMlib::Vector<T,3> > temp;

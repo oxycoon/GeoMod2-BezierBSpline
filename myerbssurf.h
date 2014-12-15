@@ -26,7 +26,7 @@ public:
     void setAnimation(Animation *animation);
 
 protected:
-    GMlib::DMatrix<GMlib::PSurf<T,3>* > _c; // Control points
+    GMlib::DMatrix<GMlib::PSurf<T,3>* > _c; // Local patches
 
     void localSimulate(double dt);
 
