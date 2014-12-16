@@ -37,7 +37,7 @@ template<typename T>
 inline
 void MBezierSurface<T>::translate(const GMlib::Vector<T,3> &trans_vector)
 {
-    std::cout << "Surf - " << this->getName() << " trans vector: " << trans_vector << std::endl;
+    //std::cout << "Surf - " << this->getName() << " trans vector: " << trans_vector << std::endl;
 
     GMlib::Parametrics<T,2,3>::translate(trans_vector);
 }
