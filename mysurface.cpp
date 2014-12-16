@@ -53,6 +53,12 @@ void MySurface::eval(float u, float v, int d1, int d2, bool, bool)
     float c2u = cos(2*u);
     float cv = cos(v);
 
+    /*
+     * x = [ cos(u) - cos(2 u) ] cos(v) / 4
+     * y = [ sin(u) + sin(2 u) ] sin(v) / 4
+     * z = cos(u)
+     * 0 <= u <= pi, 0 <= v <= 2 pi
+     */
     this->_p[0][0][0] = (cu - c2u) * cv / 4;
     this->_p[0][0][1] = (su + s2u) * sv / 4;
     this->_p[0][0][2] = cu;

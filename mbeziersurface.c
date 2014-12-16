@@ -40,6 +40,9 @@ void MBezierSurface<T>::translate(const GMlib::Vector<T,3> &trans_vector)
     //std::cout << "Surf - " << this->getName() << " trans vector: " << trans_vector << std::endl;
 
     GMlib::Parametrics<T,2,3>::translate(trans_vector);
+    //GMlib::DVector<T> temp = trans_vector;
+
+    //_c += trans_vector;
 }
 
 template<typename T>
@@ -127,7 +130,7 @@ void MBezierSurface<T>::computeBMatrix(GMlib::DMatrix<T> &m, int d, T t, T delta
         m.setDim(dim, dim);
     }
 
-    //Sets the first values in the matrix, Bertnstein poly.
+    //Sets the first values in the matrix, Bernstein poly.
     m[d-1][0] = 1-t;
     m[d-1][1] = t;
 
@@ -159,9 +162,6 @@ void MBezierSurface<T>::computeBMatrix(GMlib::DMatrix<T> &m, int d, T t, T delta
             m[i][0] = - scale * m[i][0]; //End of the row
         }
     }
-
-//    std::cout << std::endl;
-//    std::cout << m << std::endl;
 }
 
 template<typename T>
