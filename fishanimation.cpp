@@ -12,16 +12,23 @@ void FishAnimation::runAnimation(GMlib::DMatrix<GMlib::PSurf<float,3> *> &surfac
 
     float swimMovement = cos(_time);
     translate = GMlib::Vector<float,3>(0.0f, swimMovement, 0.0f);
-
     translate *= 0.01f;
 
-    surfaces[2][0]->translate(translate/4);
-    surfaces[2][1]->translate(translate/4);
-    surfaces[2][2]->translate(translate/4);
-    surfaces[2][3]->translate(translate/4);
+    for(int i = 0; i < 4; i++)
+    {
+        GMlib::PSurf<float,3> *surf = surfaces[2][i];
+        float u = surf->getParStartU() + (surf->getParEndU() - surf->getParStartU())/2.0f;
+        float v = surf->getParStartV() + (surf->getParEndV() - surf->getParStartV())/2.0f;
+        surf->evaluate(u, v, 1, 1);
+        surf->translate(translate/4);
+    }
 
-    surfaces[3][0]->translate(translate);
-    surfaces[3][1]->translate(translate);
-    surfaces[3][2]->translate(translate);
-    surfaces[3][3]->translate(translate);
+    for(int i = 0; i < 4; i++)
+    {
+        GMlib::PSurf<float,3> *surf = surfaces[3][i];
+        float u = surf->getParStartU() + (surf->getParEndU() - surf->getParStartU())/2.0f;
+        float v = surf->getParStartV() + (surf->getParEndV() - surf->getParStartV())/2.0f;
+        surf->evaluate(u, v, 1, 1);
+        surf->translate(translate);
+    }
 }

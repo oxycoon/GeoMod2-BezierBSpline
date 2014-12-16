@@ -310,9 +310,9 @@ void GMlibWrapper::initScene() {
     ///WATER
     GMlib::PPlane<float>* waterPlane = new GMlib::PPlane<float>(GMlib::Point<float,3>(-5.0f, -5.0, 0.0f), GMlib::Vector<float,3>(10.0f, 0.0f, 0.0f), GMlib::Vector<float,3>(0.0f, 10.0f, 0.0f));
     MyERBSSurf<float> *water = new MyERBSSurf<float>(waterPlane, 20, 20, 2, 2, LocalSurfaceType::SUBSURFACE);
-    water->setAnimation(new WaterAnimation(0.2f, 0.2f));
+    water->setAnimation(new WaterAnimation(0.05f, 0.2f));
     water->toggleDefaultVisualizer();
-    water->insertVisualizer(surface_visualizer);
+    //water->insertVisualizer(surface_visualizer);
     water->setMaterial(GMlib::GMmaterial::Turquoise);
     _scene->insert(water);
 
@@ -321,7 +321,7 @@ void GMlibWrapper::initScene() {
     auto surface = new MySurface(2.5f, 2.5f);
     MyERBSSurf<float>* myErbs = new MyERBSSurf<float>(surface, 4, 4, 2, 2, LocalSurfaceType::BEZIERSURFACE) ;
     myErbs->toggleDefaultVisualizer();
-    myErbs->insertVisualizer(surface_visualizer);
+    //myErbs->insertVisualizer(surface_visualizer);
     myErbs->setMaterial(GMlib::GMmaterial::Emerald);
     myErbs->setAnimation(new FishAnimation());
     myErbs->replot(20, 20, 1, 1);
